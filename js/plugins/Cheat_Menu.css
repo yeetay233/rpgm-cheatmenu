@@ -1,5 +1,5 @@
 /* =========================================================
-   CHEAT MENU LAYOUT
+CHEAT MENU LAYOUT
 ========================================================= */
 
 #cheat_menu {
@@ -26,6 +26,7 @@
 #cheat_menu_sidebar {
     position: relative;
     width: 150px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -42,11 +43,11 @@
     overflow-y: auto;
     touch-action: pan-y;
     padding: 15px;
+    padding-right: 44px;
 }
 
-
 /* =========================================================
-   SIDEBAR
+SIDEBAR
 ========================================================= */
 
 .sidebar_btn {
@@ -58,11 +59,18 @@
     font-size: 1em;
     padding: 10px;
     text-align: left;
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .sidebar_btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
+}
+
+.sidebar_btn:active {
+    background-color: rgba(0, 136, 255, 0.2);
 }
 
 .sidebar_btn.active {
@@ -71,9 +79,8 @@
     color: #00aaff;
 }
 
-
 /* =========================================================
-   TITLES / ROWS / COMMON CONTROLS
+TITLES / ROWS / COMMON CONTROLS
 ========================================================= */
 
 .cheat_menu_title {
@@ -90,6 +97,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
     margin-bottom: 10px;
     padding: 8px;
     background: rgba(255, 255, 255, 0.05);
@@ -99,22 +107,31 @@
 .cheat_label {
     flex: 1;
     font-size: 1em;
+    min-width: 0;
 }
 
 .cheat_controls {
     display: flex;
     align-items: center;
     gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .cheat_btn {
     padding: 5px 10px;
+    min-height: 44px;
+    min-width: 44px;
     background-color: #333;
     border: 1px solid #555;
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
     font-size: 1em;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .cheat_btn:hover {
@@ -136,11 +153,11 @@
     color: #00aaff;
     font-size: 1em;
     text-align: center;
+    word-break: break-word;
 }
 
-
 /* =========================================================
-   SEARCH / LISTS
+SEARCH / LISTS
 ========================================================= */
 
 .cheat_search_container {
@@ -152,16 +169,19 @@
     width: 100%;
     min-height: 120px;
     margin-bottom: 15px;
+    padding-right: 44px;
 }
 
 .cheat_search_input {
     width: 100%;
     padding: 8px;
+    min-height: 44px;
     background: #222;
     border: 1px solid #555;
     border-radius: 4px;
     color: #fff;
     font-size: 1em;
+    touch-action: manipulation;
 }
 
 .cheat_list {
@@ -180,14 +200,22 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
     padding: 4px 8px;
+    min-height: 44px;
     border-bottom: 1px solid #222;
     cursor: pointer;
     font-size: 0.95em;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cheat_list_item:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.cheat_list_item:active {
+    background: rgba(0, 136, 255, 0.2);
 }
 
 .cheat_list_item.selected {
@@ -199,11 +227,11 @@
     margin-top: 0;
     color: #888;
     font-size: 0.85em;
+    flex-shrink: 0;
 }
 
-
 /* =========================================================
-   GRID LISTS
+GRID LISTS
 ========================================================= */
 
 .cheat_list.grid {
@@ -233,9 +261,8 @@
     text-align: right;
 }
 
-
 /* =========================================================
-   SUB TABS / UMBRELLA GROUPS
+SUB TABS / UMBRELLA GROUPS
 ========================================================= */
 
 .cheat_sub_nav {
@@ -249,6 +276,7 @@
 
 .cheat_sub_tab {
     padding: 8px 15px;
+    min-height: 44px;
     background: #1a1a1a;
     border: 1px solid #444;
     border-bottom: none;
@@ -256,11 +284,17 @@
     color: #888;
     cursor: pointer;
     font-size: 0.95em;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cheat_sub_tab:hover {
     background: #2a2a2a;
     color: #fff;
+}
+
+.cheat_sub_tab:active {
+    background: rgba(0, 136, 255, 0.15);
 }
 
 .cheat_sub_tab.active {
@@ -282,15 +316,15 @@
     text-transform: uppercase;
 }
 
-
 /* =========================================================
-   SETTINGS-SPECIFIC ROWS
+SETTINGS-SPECIFIC ROWS
 ========================================================= */
 
 .cheat_setting_row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
     margin-bottom: 8px;
     padding: 8px 15px;
     background: rgba(255, 255, 255, 0.05);
@@ -318,9 +352,8 @@
     margin-top: 10px;
 }
 
-
 /* =========================================================
-   BOTTOM BAR / AMOUNT CONTROLS
+BOTTOM BAR / AMOUNT CONTROLS
 ========================================================= */
 
 .cheat_bottom_bar {
@@ -346,9 +379,8 @@
     margin-right: auto;
 }
 
-
 /* =========================================================
-   MODALS
+MODALS
 ========================================================= */
 
 .cheat_modal_bg {
@@ -362,6 +394,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.7);
+    touch-action: manipulation;
 }
 
 .cheat_modal {
@@ -369,6 +402,7 @@
     flex-direction: column;
     gap: 15px;
     width: 250px;
+    max-width: calc(100% - 20px);
     padding: 20px;
     background: #222;
     border: 1px solid #555;
@@ -387,9 +421,8 @@
     gap: 10px;
 }
 
-
 /* =========================================================
-   QUICK HUD / HOVER BUTTON
+QUICK HUD / HOVER BUTTON
 ========================================================= */
 
 #cheat_hover_btn {
@@ -406,6 +439,8 @@
     line-height: 1;
     text-align: center;
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #cheat_quick_hud {
@@ -436,6 +471,7 @@
     align-items: center;
     gap: 6px;
     padding: 8px 12px;
+    min-height: 44px;
     background: rgba(20, 20, 20, 0.8);
     border: 1px solid #555;
     border-radius: 8px;
@@ -448,6 +484,10 @@
     backdrop-filter: blur(4px);
     appearance: none;
     -webkit-appearance: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .cheat_hud_btn:hover {
@@ -455,9 +495,13 @@
     border-color: #00aaff;
 }
 
+.cheat_hud_btn:active {
+    background: rgba(0, 136, 255, 0.5) !important;
+    border-color: #00aaff;
+}
 
 /* =========================================================
-   CLOSE BUTTON
+CLOSE BUTTON
 ========================================================= */
 
 #cheat_menu_close {
@@ -473,22 +517,32 @@
     font-size: 22px;
     line-height: 1;
     user-select: none;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #cheat_menu_close:hover {
     color: #ff4444;
 }
 
+#cheat_menu_close:active {
+    color: #ff2222;
+}
 
 /* =========================================================
-   SCROLL ARROWS
+SCROLL ARROWS (unified — single system)
 ========================================================= */
 
 .cheat_scroll_arrow {
     position: absolute;
-    right: 4px;
-    width: 28px;
-    height: 28px;
+    right: 6px;
+    width: 30px;
+    height: 30px;
     display: none;
     align-items: center;
     justify-content: center;
@@ -502,10 +556,12 @@
     font-weight: bold;
     line-height: 1;
     cursor: pointer;
-    z-index: 80;
+    z-index: 120;
     user-select: none;
     -webkit-user-select: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cheat_scroll_arrow.up {
@@ -516,6 +572,24 @@
     bottom: 8px;
 }
 
+#cheat_menu>.cheat_scroll_arrow.up {
+    top: 56px;
+    right: 8px;
+}
+
+#cheat_menu>.cheat_scroll_arrow.down {
+    bottom: 8px;
+    right: 8px;
+}
+
+.cheat_search_container>.cheat_scroll_arrow.up {
+    top: 52px;
+}
+
+.cheat_search_container>.cheat_scroll_arrow.down {
+    bottom: 8px;
+}
+
 .cheat_scroll_arrow:hover,
 .cheat_scroll_arrow:active {
     background: rgba(0, 136, 255, 0.32);
@@ -523,23 +597,8 @@
     color: #ffffff;
 }
 
-#cheat_menu_sidebar,
-#cheat_menu_content,
-.cheat_search_container {
-    position: relative;
-}
-
-#cheat_menu_content {
-    padding-right: 42px;
-}
-
-.cheat_search_container {
-    padding-right: 42px;
-}
-
-
 /* =========================================================
-   SCROLLBARS
+SCROLLBARS
 ========================================================= */
 
 ::-webkit-scrollbar {
@@ -559,141 +618,46 @@
     background: #777;
 }
 
-/* SIMPLE SCROLL BUTTONS */
-#cheatmenusidebar, #cheatmenucontent, .cheatsearchcontainer {
-  position: relative;
-}
+/* =========================================================
+RESPONSIVE — narrow screens (JoiPlay / mobile)
+========================================================= */
 
-.cheatscrollwrap {
-  position: relative;
-  width: 100%;
-  min-height: 0;
-}
+@media screen and (max-width: 500px) {
+    #cheat_menu_sidebar {
+        width: 110px;
+    }
 
-.cheatmenusidebarwrap {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 34px;
-}
+    .sidebar_btn {
+        font-size: 0.82em;
+        padding: 8px 6px;
+    }
 
-.cheatmenucontentwrap {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 34px;
-}
+    .sidebar_btn.active {
+        border-left-width: 2px;
+    }
 
-.cheatsearchcontainer .cheatlist {
-  padding-right: 0;
-}
+    .cheat_menu_title {
+        font-size: 1.15em;
+    }
 
-.cheatscrollbtn {
-  position: absolute;
-  right: 6px;
-  width: 24px;
-  height: 24px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  background: rgba(20, 20, 20, 0.94);
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  line-height: 1;
-  cursor: pointer;
-  z-index: 90;
-  user-select: none;
-  -webkit-user-select: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
-}
+    .cheat_sub_tab {
+        padding: 8px 10px;
+        font-size: 0.85em;
+    }
 
-.cheatscrollbtn.up { top: 6px; }
-.cheatscrollbtn.down { bottom: 6px; }
+    .cheat_row,
+    .cheat_setting_row {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
 
-.cheatscrollbtn:hover,
-.cheatscrollbtn:active {
-  background: rgba(0, 136, 255, 0.32);
-  border-color: #00aaff;
-}
+    .cheat_controls {
+        width: 100%;
+        justify-content: flex-end;
+    }
 
-.cheatscrollbtn.disabled {
-  opacity: 0.35;
-}
-
-.cheatscrollwrap.show-top-fade::before,
-.cheatscrollwrap.show-bottom-fade::after,
-.cheatsearchcontainer.show-top-fade::before,
-.cheatsearchcontainer.show-bottom-fade::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 30px;
-  height: 18px;
-  pointer-events: none;
-  z-index: 40;
-}
-
-.cheatscrollwrap.show-top-fade::before,
-.cheatsearchcontainer.show-top-fade::before {
-  top: 0;
-  background: linear-gradient(to bottom, rgba(20,20,20,0.92), rgba(20,20,20,0));
-}
-
-.cheatscrollwrap.show-bottom-fade::after,
-.cheatsearchcontainer.show-bottom-fade::after {
-  bottom: 0;
-  background: linear-gradient(to top, rgba(20,20,20,0.92), rgba(20,20,20,0));
-}
-
-#cheat_menu {
-    position: absolute;
-}
-
-#cheat_menu_content {
-    padding-right: 48px;
-}
-
-.cheat_fixed_content_scroll {
-    position: absolute;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-    background: rgba(20, 20, 20, 0.94);
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 120;
-    user-select: none;
-    -webkit-user-select: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-}
-
-.cheat_fixed_content_scroll.up {
-    top: 48px;
-    margin-right: 5px;
-}
-
-.cheat_fixed_content_scroll.down {
-    bottom: 8px;
-    margin-right: 5px;
-}
-
-.cheat_fixed_content_scroll:hover,
-.cheat_fixed_content_scroll:active {
-    background: rgba(0, 136, 255, 0.32);
-    border-color: #00aaff;
-    color: #ffffff;
+    #cheat_menu_content {
+        padding: 12px;
+        padding-right: 42px;
+    }
 }
