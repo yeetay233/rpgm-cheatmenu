@@ -9,7 +9,7 @@ Cheat_Menu.initialize = function () {
     Cheat_Menu.cheat_menu_open = false;
     Cheat_Menu.speed_initialized = false;
     Cheat_Menu._menus_grouped = false;
-    Cheat_Menu.sub_tab_selected = 0;
+    Cheat_Menu.sub_tab_per_group = {};
     Cheat_Menu.list_state = { search: "", scroll: 0 };
 
     // Remove any existing menu from DOM
@@ -23,6 +23,8 @@ Cheat_Menu.initialize = function () {
         Cheat_Menu.menu_update_timer = null;
     }
 
+    // Reset page registry so grouping re-collects flat page list on next menu open
+    Cheat_Menu._pages_registered = false;
     // Register page functions (safe - no game data access)
     Cheat_Menu.register_pages();
 
@@ -38,7 +40,9 @@ Cheat_Menu.initialize = function () {
 DataManager.default_loadGame = DataManager.loadGame;
 DataManager.loadGame = function (savefileId) {
     Cheat_Menu.initialize();
-    return DataManager.default_loadGame(savefileId);
+    var result = DataManager.default_loadGame(savefileId);
+    Cheat_Menu.load_saved_values();
+    return result;
 };
 
 // Hook: New Game

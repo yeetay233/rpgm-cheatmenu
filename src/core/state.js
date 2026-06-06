@@ -34,7 +34,7 @@ Cheat_Menu.speed_initialized = false;
 
 // UI state
 Cheat_Menu.fontSize = 14;
-Cheat_Menu.menu_scale = 60;
+Cheat_Menu.menu_scale = 75;
 Cheat_Menu.btn_config = { ...Cheat_Menu.default_btn_config };
 Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config };
 
@@ -42,7 +42,7 @@ Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config };
 Cheat_Menu.menus = [];
 Cheat_Menu.menu_names = [];
 Cheat_Menu._menus_grouped = false;
-Cheat_Menu.sub_tab_selected = 0;
+Cheat_Menu.sub_tab_per_group = {};
 Cheat_Menu.list_state = { search: "", scroll: 0 };
 
 // Key listeners

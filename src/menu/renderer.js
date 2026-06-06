@@ -32,7 +32,6 @@ Cheat_Menu.update_menu = function () {
             e.preventDefault();
             if (Cheat_Menu.cheat_selected !== idx) {
                 Cheat_Menu.cheat_selected = idx;
-                Cheat_Menu.sub_tab_selected = 0;
                 Cheat_Menu.list_state = { search: "", scroll: 0 };
                 SoundManager.playSystemSound(0);
                 Cheat_Menu.update_menu();

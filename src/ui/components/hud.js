@@ -148,7 +148,8 @@ Cheat_Menu.open_tab_by_name = function (name) {
     var idx = names.indexOf(name);
     if (idx !== -1) {
         Cheat_Menu.cheat_selected = idx;
-        Cheat_Menu.sub_tab_selected = 0;
+        if (!Cheat_Menu.sub_tab_per_group) Cheat_Menu.sub_tab_per_group = {};
+        Cheat_Menu.sub_tab_per_group[name] = 0;
         if (!Cheat_Menu.cheat_menu_open) {
             Cheat_Menu.open_menu();
         } else {

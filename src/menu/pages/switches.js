@@ -13,11 +13,12 @@ Cheat_Menu.create_page_switches = function () {
             Cheat_Menu.update_menu();
         },
         function (item, idx) { return item || "Switch " + idx; },
-        false,
+        true,
         function (idx) {
             return $gameSwitches.value(idx) ? "ON" : "OFF";
         },
-        true
+        false,
+        'grid-wide'
     );
     var current_switch_value = 'NULL';
     if ($gameSwitches.value(Cheat_Menu.switch_selection) != undefined) {

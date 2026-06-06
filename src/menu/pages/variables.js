@@ -29,11 +29,12 @@ Cheat_Menu.create_page_variables = function () {
             }
         },
         function (item, idx) { return item || "Variable " + idx; },
-        false,
+        true,
         function (idx) {
             return $gameVariables.value(idx);
         },
-        true
+        false,
+        'grid-wide'
     );
     var current_val = $gameVariables.value(Cheat_Menu.variable_selection);
     if (typeof current_val === "string") {

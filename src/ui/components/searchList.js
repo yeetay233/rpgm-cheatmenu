@@ -2,7 +2,7 @@
 // Cheat Menu - Searchable List Component
 // ============================================================
 
-Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCallback, getNameFunc, isGrid, getValueFunc, verticalLayout) {
+Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCallback, getNameFunc, isGrid, getValueFunc, verticalLayout, extraClass) {
     var container = document.createElement('div');
     container.className = "cheat_search_container";
 
@@ -16,6 +16,7 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
     var listClass = "cheat_list";
     if (isGrid) listClass += " grid";
     if (verticalLayout) listClass += " vertical";
+    if (extraClass) listClass += " " + extraClass;
     listDiv.className = listClass;
 
     var renderList = function (filterText) {
@@ -32,7 +33,11 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
                 var li = document.createElement('li');
                 li.className = "cheat_list_item";
                 if (i === selectedIdx) li.className += " selected";
-                li.innerHTML = i + ": " + name;
+
+                var labelSpan = document.createElement('span');
+                labelSpan.className = "cheat_list_item_label";
+                labelSpan.innerHTML = i + ": " + name;
+                li.appendChild(labelSpan);
 
                 if (getValueFunc) {
                     var valDiv = document.createElement('div');

@@ -76,8 +76,13 @@ Cheat_Menu.position_menu = function () {
 };
 
 Cheat_Menu.update_menu_size = function () {
-    Cheat_Menu.overlay_box.style.width = Cheat_Menu.menu_scale + "vw";
-    Cheat_Menu.overlay_box.style.height = Cheat_Menu.menu_scale + "vh";
+    if (Cheat_Menu.manual_menu_size) {
+        Cheat_Menu.overlay_box.style.width = Cheat_Menu.manual_menu_size.w + "px";
+        Cheat_Menu.overlay_box.style.height = Cheat_Menu.manual_menu_size.h + "px";
+    } else {
+        Cheat_Menu.overlay_box.style.width = Cheat_Menu.menu_scale + "vw";
+        Cheat_Menu.overlay_box.style.height = Cheat_Menu.menu_scale + "vh";
+    }
 };
 
 Cheat_Menu.close_menu = function () {
@@ -88,6 +93,57 @@ Cheat_Menu.close_menu = function () {
     Cheat_Menu.cheat_menu_open = false;
     Cheat_Menu.render_quick_hud();
     SoundManager.playSystemSound(2);
+};
+
+// Resize handle drag logic
+Cheat_Menu._initResizeHandle = function () {
+    var handle = document.getElementById('cheat_menu_resize_handle');
+    if (!handle) return;
+    if (handle._resizeBound) return;
+    handle._resizeBound = true;
+
+    var startX = 0, startY = 0, startW = 0, startH = 0;
+    var isResizing = false;
+
+    function onStart(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        isResizing = true;
+        var rect = Cheat_Menu.overlay_box.getBoundingClientRect();
+        startW = rect.width;
+        startH = rect.height;
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
+        startY = e.touches ? e.touches[0].clientY : e.clientY;
+    }
+
+    function onMove(e) {
+        if (!isResizing) return;
+        var dx = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+        var dy = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+        var newW = Math.max(200, startW + dx);
+        var newH = Math.max(150, startH + dy);
+        Cheat_Menu.overlay_box.style.width = newW + "px";
+        Cheat_Menu.overlay_box.style.height = newH + "px";
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function onEnd() {
+        if (!isResizing) return;
+        isResizing = false;
+        var rect = Cheat_Menu.overlay_box.getBoundingClientRect();
+        Cheat_Menu.manual_menu_size = { w: rect.width, h: rect.height };
+        if (typeof $gameSystem !== 'undefined' && $gameSystem) {
+            Cheat_Menu.save_values();
+        }
+    }
+
+    handle.addEventListener('mousedown', onStart);
+    handle.addEventListener('touchstart', onStart, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
 };
 
 Cheat_Menu.open_menu = function () {
@@ -111,5 +167,13 @@ Cheat_Menu.open_menu = function () {
             Cheat_Menu.close_menu();
         });
         cm.appendChild(closeBtn);
+    }
+
+    // Inject resize handle
+    if (cm && !document.getElementById('cheat_menu_resize_handle')) {
+        var resizeHandle = document.createElement('div');
+        resizeHandle.id = "cheat_menu_resize_handle";
+        cm.appendChild(resizeHandle);
+        Cheat_Menu._initResizeHandle();
     }
 };

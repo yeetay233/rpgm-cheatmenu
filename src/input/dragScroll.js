@@ -6,6 +6,8 @@ Cheat_Menu.initDragScroll = function (el) {
     if (!el || el._dragScrollBound) return;
     el._dragScrollBound = true;
 
+    el.style.webkitOverflowScrolling = 'touch';
+
     var startY = 0;
     var startX = 0;
     var scrollTopStart = 0;

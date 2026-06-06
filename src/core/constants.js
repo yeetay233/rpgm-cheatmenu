@@ -49,7 +49,10 @@ Cheat_Menu.initial_values = {
     speed: null,
     speed_unlocked: true,
     fontSize: 14,
-    menu_scale: 60,
+    menu_scale: 75,
+    manual_menu_size: null,
+    sub_tab_per_group: {},
+    list_state: { search: "", scroll: 0 },
     btn_config: {
         enabled: true,
         opacity: 30,
@@ -85,4 +88,4 @@ Cheat_Menu.default_hud_config = {
 Cheat_Menu.scroll_button_step = 120;
 
 // Drag threshold for touch/mouse drag scroll
-Cheat_Menu.DRAG_THRESHOLD = 5;
+Cheat_Menu.DRAG_THRESHOLD = 3;

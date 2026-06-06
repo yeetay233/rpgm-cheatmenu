@@ -33,33 +33,6 @@ Cheat_Menu.register_pages = function () {
 
 Cheat_Menu.inject_ui_settings = function () {
     Cheat_Menu.menus.push(function () {
-        Cheat_Menu.append_cheat_title("Interface");
-        Cheat_Menu.append_setting_row("Menu Scale Size", Cheat_Menu.menu_scale + "%",
-            function () { Cheat_Menu.menu_scale = Math.max(30, Cheat_Menu.menu_scale - 5); Cheat_Menu.update_menu(); },
-            function () { Cheat_Menu.menu_scale = Math.min(100, Cheat_Menu.menu_scale + 5); Cheat_Menu.update_menu(); }
-        );
-        Cheat_Menu.append_setting_row("Hover Toggle Button", Cheat_Menu.btn_config.enabled ? "ON" : "OFF", null,
-            function () { Cheat_Menu.btn_config.enabled = !Cheat_Menu.btn_config.enabled; Cheat_Menu.update_menu(); }
-        );
-        if (Cheat_Menu.btn_config.enabled) {
-            Cheat_Menu.append_setting_row("Toggle Button Position", Cheat_Menu.btn_positions[Cheat_Menu.btn_config.posIndex],
-                function () {
-                    Cheat_Menu.btn_config.posIndex = (Cheat_Menu.btn_config.posIndex - 1 + Cheat_Menu.btn_positions.length) % Cheat_Menu.btn_positions.length;
-                    Cheat_Menu.update_menu();
-                },
-                function () {
-                    Cheat_Menu.btn_config.posIndex = (Cheat_Menu.btn_config.posIndex + 1) % Cheat_Menu.btn_positions.length;
-                    Cheat_Menu.update_menu();
-                }
-            );
-            Cheat_Menu.append_setting_row("Toggle Button Opacity", Cheat_Menu.btn_config.opacity + "%",
-                function () { Cheat_Menu.btn_config.opacity = Math.max(10, Cheat_Menu.btn_config.opacity - 10); Cheat_Menu.update_menu(); },
-                function () { Cheat_Menu.btn_config.opacity = Math.min(100, Cheat_Menu.btn_config.opacity + 10); Cheat_Menu.update_menu(); }
-            );
-        }
-    });
-
-    Cheat_Menu.menus.push(function () {
         Cheat_Menu.append_cheat_title("Quick Actions HUD");
         Cheat_Menu.append_setting_row("Enable Taskbar HUD", Cheat_Menu.hud_config.enabled ? "ON" : "OFF", null,
             function () { Cheat_Menu.hud_config.enabled = !Cheat_Menu.hud_config.enabled; Cheat_Menu.update_menu(); }
@@ -88,8 +61,8 @@ Cheat_Menu.inject_ui_settings = function () {
                 btn.className = "cheat_btn" + (isActive ? " active" : "");
                 btn.style.width = "100%";
                 btn.style.padding = "8px 4px";
-                btn.style.backgroundColor = isActive ? "rgba(0, 136, 255, 0.3)" : "";
-                btn.style.borderColor = isActive ? "#00aaff" : "";
+                btn.style.backgroundColor = isActive ? "rgba(68, 204, 85, 0.3)" : "";
+                btn.style.borderColor = isActive ? "#44cc55" : "";
                 btn.innerHTML = Cheat_Menu.hud_actions[k].title;
                 btn.addEventListener('mousedown', function (e) {
                     e.preventDefault();
@@ -120,7 +93,7 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
     for (var i = 0; i < Cheat_Menu.menus.length; i++) {
         var len = rawNames.length;
-        Cheat_Menu.menus[i]();
+        try { Cheat_Menu.menus[i](); } catch (e) { /* silent — skip broken page */ }
         if (rawNames.length === len) {
             rawNames.push("Menu " + (i + 1));
         }
@@ -133,12 +106,12 @@ Cheat_Menu.group_menus_by_umbrella = function () {
     var rawMenus = Cheat_Menu.menus.slice();
 
     var groups = {
-        "Inventory": { keys: ["item", "weapon", "armor"], items: [] },
-        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god"], items: [] },
+        "Inventory": { keys: ["items", "weapon", "armor"], items: [] },
+        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states"], items: [] },
         "Progression": { keys: ["exp", "stat", "gold"], items: [] },
         "Variables & Switches": { keys: ["variable", "switch"], items: [] },
-        "Movement": { keys: ["no clip", "speed"], items: [] },
-        "Navigation": { keys: ["save and recall", "teleport"], items: [] },
+        "Movement": { keys: ["no clip", "speed", "noclip"], items: [] },
+        "Navigation": { keys: ["save and recall", "teleport", "recall"], items: [] },
         "Settings": { keys: ["settings", "interface", "quick actions hud", "general"], items: [] }
     };
 
@@ -177,20 +150,20 @@ Cheat_Menu.group_menus_by_umbrella = function () {
             var nav = document.createElement('div');
             nav.className = "cheat_sub_nav";
 
-            if (Cheat_Menu.sub_tab_selected >= items.length) {
-                Cheat_Menu.sub_tab_selected = 0;
-            }
+            if (!Cheat_Menu.sub_tab_per_group) Cheat_Menu.sub_tab_per_group = {};
+            var subIdx = Cheat_Menu.sub_tab_per_group[title] || 0;
+            if (subIdx >= items.length) subIdx = 0;
 
             for (var j = 0; j < items.length; j++) {
                 let btn = document.createElement('button');
-                btn.className = "cheat_sub_tab" + (Cheat_Menu.sub_tab_selected === j ? " active" : "");
+                btn.className = "cheat_sub_tab" + (subIdx === j ? " active" : "");
                 btn.innerHTML = items[j].name;
                 let idx = j;
 
                 btn.addEventListener('mousedown', function (e) {
                     e.preventDefault();
-                    if (Cheat_Menu.sub_tab_selected !== idx) {
-                        Cheat_Menu.sub_tab_selected = idx;
+                    if (subIdx !== idx) {
+                        Cheat_Menu.sub_tab_per_group[title] = idx;
                         Cheat_Menu.list_state = { search: "", scroll: 0 };
                         SoundManager.playSystemSound(0);
                         Cheat_Menu.update_menu();
@@ -204,7 +177,7 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
             var old_append = Cheat_Menu.append_cheat_title;
             Cheat_Menu.append_cheat_title = function () { };
-            items[Cheat_Menu.sub_tab_selected].fn();
+            items[subIdx].fn();
             Cheat_Menu.append_cheat_title = old_append;
         });
 
