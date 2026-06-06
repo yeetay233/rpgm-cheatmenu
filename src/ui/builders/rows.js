@@ -2,6 +2,11 @@
 // Cheat Menu - UI Row Builders
 // ============================================================
 
+Cheat_Menu.addEvent = function (el, handler) {
+    el.addEventListener('mousedown', handler);
+    el.addEventListener('touchstart', handler, { passive: false });
+};
+
 Cheat_Menu.append_title = function (title) {
     var title_div = document.createElement('div');
     title_div.className = "cheat_menu_title";
@@ -34,7 +39,7 @@ Cheat_Menu.append_cheat = function (cheat_text, status_text, key, click_handler)
     var btn = document.createElement('button');
     btn.className = "cheat_btn";
     btn.innerHTML = status_text;
-    btn.addEventListener('mousedown', click_handler);
+    Cheat_Menu.addEvent(btn, click_handler);
 
     row.appendChild(label);
     row.appendChild(btn);
@@ -49,7 +54,7 @@ Cheat_Menu.append_scroll_selector = function (text, key1, key2, scroll_handler, 
     var btnLeft = document.createElement('button');
     btnLeft.className = "cheat_btn";
     btnLeft.innerHTML = "←";
-    btnLeft.addEventListener('mousedown', scroll_handler.bind(null, "left"));
+    Cheat_Menu.addEvent(btnLeft, scroll_handler.bind(null, "left"));
 
     var centerText = document.createElement('div');
     centerText.className = "cheat_value";
@@ -60,7 +65,7 @@ Cheat_Menu.append_scroll_selector = function (text, key1, key2, scroll_handler, 
     var btnRight = document.createElement('button');
     btnRight.className = "cheat_btn";
     btnRight.innerHTML = "→";
-    btnRight.addEventListener('mousedown', scroll_handler.bind(null, "right"));
+    Cheat_Menu.addEvent(btnRight, scroll_handler.bind(null, "right"));
 
     row.appendChild(btnLeft);
     row.appendChild(centerText);
@@ -71,7 +76,7 @@ Cheat_Menu.append_scroll_selector = function (text, key1, key2, scroll_handler, 
         btnApply.className = "cheat_btn";
         btnApply.innerHTML = "Apply";
         btnApply.style.marginLeft = "10px";
-        btnApply.addEventListener('mousedown', apply_handler);
+        Cheat_Menu.addEvent(btnApply, apply_handler);
         row.appendChild(btnApply);
     }
 
@@ -92,12 +97,12 @@ Cheat_Menu.append_add_remove = function (text, amount, onApply) {
     var btnRemove = document.createElement('button');
     btnRemove.className = "cheat_btn";
     btnRemove.innerHTML = "- " + amount;
-    btnRemove.addEventListener('mousedown', function () { onApply("left"); });
+    Cheat_Menu.addEvent(btnRemove, function () { onApply("left"); });
 
     var btnAdd = document.createElement('button');
     btnAdd.className = "cheat_btn";
     btnAdd.innerHTML = "+ " + amount;
-    btnAdd.addEventListener('mousedown', function () { onApply("right"); });
+    Cheat_Menu.addEvent(btnAdd, function () { onApply("right"); });
 
     controls.appendChild(btnRemove);
     controls.appendChild(btnAdd);

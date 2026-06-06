@@ -41,11 +41,9 @@ var modules = [
     // Menu Pages
     'menu/pages/sharedHandlers.js',
     'menu/pages/godMode.js',
-    'menu/pages/noClip.js',
+
     'menu/pages/enemyHp.js',
-    'menu/pages/partyHp.js',
-    'menu/pages/partyMp.js',
-    'menu/pages/partyTp.js',
+    'menu/pages/partyVitals.js',
     'menu/pages/speed.js',
     'menu/pages/giveExp.js',
     'menu/pages/stats.js',

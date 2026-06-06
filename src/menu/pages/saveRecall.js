@@ -1,37 +1,79 @@
 // ============================================================
-// Cheat Menu - Page: Save and Recall
+// Cheat Menu - Save and Recall
 // ============================================================
 
 Cheat_Menu.create_page_save_recall = function () {
     Cheat_Menu.append_cheat_title("Save and Recall");
-    Cheat_Menu.append_title("Current Position: ");
-    if ($dataMapInfos[$gameMap.mapId()] && $dataMapInfos[$gameMap.mapId()].name) {
-        var current_map = "" + $gameMap.mapId() + ": " + $dataMapInfos[$gameMap.mapId()].name;
-        Cheat_Menu.append_description(current_map);
-        var map_pos = "(" + $gamePlayer.x + ", " + $gamePlayer.y + ")";
-        Cheat_Menu.append_description(map_pos);
-    } else {
-        Cheat_Menu.append_description("NULL");
-    }
 
     for (var i = 0; i < Cheat_Menu.saved_positions.length; i++) {
-        Cheat_Menu.append_title("Position " + (i + 1));
-        var map_text;
-        var pos_text;
-        if (Cheat_Menu.saved_positions[i].m != -1) {
-            map_text = "" + Cheat_Menu.saved_positions[i].m + ": ";
-            if ($dataMapInfos[Cheat_Menu.saved_positions[i].m].name) {
-                map_text += $dataMapInfos[Cheat_Menu.saved_positions[i].m].name;
-            } else {
-                map_text += "NULL";
-            }
-            pos_text = "(" + Cheat_Menu.saved_positions[i].x + ", " + Cheat_Menu.saved_positions[i].y + ")";
+        var pos = Cheat_Menu.saved_positions[i];
+        var slotLabel = "Slot " + (i + 1) + ": ";
+        if (pos.m !== -1) {
+            var mapName = $dataMapInfos[pos.m] ? $dataMapInfos[pos.m].name : "Map " + pos.m;
+            slotLabel += mapName + " (" + pos.x + ", " + pos.y + ")";
         } else {
-            map_text = "NULL";
-            pos_text = "NULL";
+            slotLabel += "Empty";
         }
-        Cheat_Menu.append_cheat("Save:", map_text, null, Cheat_Menu.save_position.bind(null, i));
-        Cheat_Menu.append_cheat("Recall:", pos_text, null, Cheat_Menu.recall_position.bind(null, i));
+
+        var row = document.createElement('div');
+        row.className = "cheat_row";
+
+        var label = document.createElement('div');
+        label.className = "cheat_label";
+        label.style.flex = "1";
+        label.style.fontSize = "0.85em";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.innerHTML = slotLabel;
+
+        var controls = document.createElement('div');
+        controls.className = "cheat_controls";
+
+        var btnSave = document.createElement('button');
+        btnSave.className = "cheat_btn";
+        btnSave.innerHTML = "Save";
+        btnSave.style.minWidth = "50px";
+        var saveFn = Cheat_Menu.save_position.bind(null, i);
+        btnSave.addEventListener('mousedown', saveFn);
+        btnSave.addEventListener('touchstart', saveFn, { passive: false });
+
+        var btnRecall = document.createElement('button');
+        btnRecall.className = "cheat_btn";
+        btnRecall.innerHTML = "Recall";
+        btnRecall.style.minWidth = "55px";
+        if (pos.m !== -1) {
+            btnRecall.style.borderColor = "#44cc55";
+        } else {
+            btnRecall.style.opacity = "0.4";
+        }
+        var recallFn = function (slotIdx) {
+            return function (e) {
+                e.preventDefault();
+                var p = Cheat_Menu.saved_positions[slotIdx];
+                if (p.m === -1) {
+                    SoundManager.playSystemSound(2);
+                    return;
+                }
+                var mapName = $dataMapInfos[p.m] ? $dataMapInfos[p.m].name : "Map " + p.m;
+                Cheat_Menu.open_confirm_modal(
+                    "Teleport to " + mapName + " at (" + p.x + ", " + p.y + ")?",
+                    function () {
+                        Cheat_Menu.teleport(p.m, p.x, p.y);
+                        SoundManager.playSystemSound(1);
+                        Cheat_Menu.update_menu();
+                    }
+                );
+            };
+        }(i);
+        btnRecall.addEventListener('mousedown', recallFn);
+        btnRecall.addEventListener('touchstart', recallFn, { passive: false });
+
+        controls.appendChild(btnSave);
+        controls.appendChild(btnRecall);
+        row.appendChild(label);
+        row.appendChild(controls);
+        Cheat_Menu.content.appendChild(row);
     }
 };
 
@@ -40,15 +82,5 @@ Cheat_Menu.save_position = function (pos_num) {
     Cheat_Menu.saved_positions[pos_num].x = $gamePlayer.x;
     Cheat_Menu.saved_positions[pos_num].y = $gamePlayer.y;
     SoundManager.playSystemSound(1);
-    Cheat_Menu.update_menu();
-};
-
-Cheat_Menu.recall_position = function (pos_num) {
-    if (Cheat_Menu.saved_positions[pos_num].m != -1) {
-        Cheat_Menu.teleport(Cheat_Menu.saved_positions[pos_num].m, Cheat_Menu.saved_positions[pos_num].x, Cheat_Menu.saved_positions[pos_num].y);
-        SoundManager.playSystemSound(1);
-    } else {
-        SoundManager.playSystemSound(2);
-    }
     Cheat_Menu.update_menu();
 };

@@ -18,11 +18,15 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
     if (verticalLayout) listClass += " vertical";
     if (extraClass) listClass += " " + extraClass;
     listDiv.className = listClass;
+    listDiv.tabIndex = -1;
+
+    var focusedIndex = 0;
 
     var renderList = function (filterText) {
         listDiv.innerHTML = "";
         filterText = filterText.toLowerCase();
 
+        var visibleItems = [];
         for (var i = 1; i < dataArray.length; i++) {
             if (!dataArray[i]) continue;
 
@@ -30,30 +34,54 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
             if (typeof name !== "string") name = String(name);
 
             if (name && name.toLowerCase().indexOf(filterText) !== -1) {
-                var li = document.createElement('li');
-                li.className = "cheat_list_item";
-                if (i === selectedIdx) li.className += " selected";
-
-                var labelSpan = document.createElement('span');
-                labelSpan.className = "cheat_list_item_label";
-                labelSpan.innerHTML = i + ": " + name;
-                li.appendChild(labelSpan);
-
-                if (getValueFunc) {
-                    var valDiv = document.createElement('div');
-                    valDiv.className = "cheat_list_item_val";
-                    valDiv.innerHTML = getValueFunc(i);
-                    li.appendChild(valDiv);
-                }
-
-                li.addEventListener('mousedown', (function (idx) {
-                    return function (e) {
-                        e.preventDefault();
-                        onSelectCallback(idx);
-                    };
-                })(i));
-                listDiv.appendChild(li);
+                visibleItems.push({ idx: i, name: name });
             }
+        }
+
+        if (visibleItems.length === 0) {
+            var emptyLi = document.createElement('li');
+            emptyLi.className = "cheat_list_item";
+            emptyLi.style.justifyContent = "center";
+            emptyLi.style.color = "#666";
+            emptyLi.style.cursor = "default";
+            emptyLi.innerHTML = "No results";
+            listDiv.appendChild(emptyLi);
+            return;
+        }
+
+        searchInput.placeholder = "Search (" + visibleItems.length + " results)...";
+
+        for (var v = 0; v < visibleItems.length; v++) {
+            var item = visibleItems[v];
+            var li = document.createElement('li');
+            li.className = "cheat_list_item";
+            if (item.idx === selectedIdx) {
+                li.className += " selected";
+                focusedIndex = v;
+            }
+            li.dataset.listIndex = v;
+
+            var labelSpan = document.createElement('span');
+            labelSpan.className = "cheat_list_item_label";
+            labelSpan.innerHTML = item.idx + ": " + item.name;
+            li.appendChild(labelSpan);
+
+            if (getValueFunc) {
+                var valDiv = document.createElement('div');
+                valDiv.className = "cheat_list_item_val";
+                valDiv.innerHTML = getValueFunc(item.idx);
+                li.appendChild(valDiv);
+            }
+
+            (function (idx) {
+                var selectFn = function (e) {
+                    e.preventDefault();
+                    onSelectCallback(idx);
+                };
+                li.addEventListener('mousedown', selectFn);
+                li.addEventListener('touchstart', selectFn, { passive: false });
+            })(item.idx);
+            listDiv.appendChild(li);
         }
     };
 
@@ -63,7 +91,28 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
         renderList(e.target.value);
     });
 
-    searchInput.addEventListener('keydown', function (e) { e.stopPropagation(); });
+    searchInput.addEventListener('keydown', function (e) {
+        e.stopPropagation();
+        if (e.keyCode === 40) {
+            e.preventDefault();
+            var items = listDiv.querySelectorAll('.cheat_list_item');
+            if (items.length === 0) return;
+            focusedIndex = Math.min(focusedIndex + 1, items.length - 1);
+            items[focusedIndex].scrollIntoView({ block: 'nearest' });
+        } else if (e.keyCode === 38) {
+            e.preventDefault();
+            var items = listDiv.querySelectorAll('.cheat_list_item');
+            if (items.length === 0) return;
+            focusedIndex = Math.max(focusedIndex - 1, 0);
+            items[focusedIndex].scrollIntoView({ block: 'nearest' });
+        } else if (e.keyCode === 13) {
+            e.preventDefault();
+            var items = listDiv.querySelectorAll('.cheat_list_item');
+            if (items.length > focusedIndex) {
+                items[focusedIndex].click();
+            }
+        }
+    });
 
     listDiv.onscroll = function () {
         Cheat_Menu.list_state.scroll = listDiv.scrollTop;

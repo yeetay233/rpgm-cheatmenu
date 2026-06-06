@@ -1,0 +1,61 @@
+// ============================================================
+// Cheat Menu - Page: Party Vitals (HP/MP/TP merged, grid)
+// ============================================================
+
+Cheat_Menu.create_page_party_vitals = function () {
+    Cheat_Menu.append_cheat_title("Party Vitals");
+
+    var items = [
+        { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(0, true); } },
+        { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(1, true); } },
+        { label: "Full HP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_hp(true); } },
+        { label: "HP 0", btn: "All", fn: function () { Cheat_Menu.set_party_hp(0, false); } },
+        { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_party_hp(1, false); } },
+        { label: "Full HP", btn: "All", fn: function () { Cheat_Menu.recover_party_hp(false); } },
+        { label: "MP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_mp(0, true); } },
+        { label: "MP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_mp(1, true); } },
+        { label: "Full MP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_mp(true); } },
+        { label: "MP 0", btn: "All", fn: function () { Cheat_Menu.set_party_mp(0, false); } },
+        { label: "MP 1", btn: "All", fn: function () { Cheat_Menu.set_party_mp(1, false); } },
+        { label: "Full MP", btn: "All", fn: function () { Cheat_Menu.recover_party_mp(false); } },
+        { label: "TP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_tp(0, true); } },
+        { label: "TP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_tp(1, true); } },
+        { label: "Full TP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_tp(true); } },
+        { label: "TP 0", btn: "All", fn: function () { Cheat_Menu.set_party_tp(0, false); } },
+        { label: "TP 1", btn: "All", fn: function () { Cheat_Menu.set_party_tp(1, false); } },
+        { label: "Full TP", btn: "All", fn: function () { Cheat_Menu.recover_party_tp(false); } }
+    ];
+
+    var grid = document.createElement('div');
+    grid.className = "cheat_action_grid";
+
+    for (var i = 0; i < items.length; i++) {
+        (function (item) {
+            var cell = document.createElement('div');
+            cell.className = "cheat_action_cell";
+
+            var btn = document.createElement('button');
+            btn.className = "cheat_btn";
+            btn.innerHTML = "<b>" + item.label + "</b><br><small>" + item.btn + "</small>";
+            btn.style.width = "100%";
+            btn.style.height = "100%";
+            btn.style.padding = "6px 4px";
+            btn.style.lineHeight = "1.3";
+            btn.style.whiteSpace = "normal";
+            btn.style.wordBreak = "break-word";
+            var pvFn = function (e) {
+                e.preventDefault();
+                item.fn();
+                SoundManager.playSystemSound(1);
+                Cheat_Menu.update_menu();
+            };
+            btn.addEventListener('mousedown', pvFn);
+            btn.addEventListener('touchstart', pvFn, { passive: false });
+
+            cell.appendChild(btn);
+            grid.appendChild(cell);
+        })(items[i]);
+    }
+
+    Cheat_Menu.content.appendChild(grid);
+};

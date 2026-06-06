@@ -10,11 +10,9 @@ Cheat_Menu.register_pages = function () {
     // Insert at front so menu order is as defined here
     Cheat_Menu.menus = [
         Cheat_Menu.create_page_god_mode,
-        Cheat_Menu.create_page_no_clip,
+        Cheat_Menu.create_page_speed,
         Cheat_Menu.create_page_enemy_hp,
-        Cheat_Menu.create_page_party_hp,
-        Cheat_Menu.create_page_party_mp,
-        Cheat_Menu.create_page_party_tp,
+        Cheat_Menu.create_page_party_vitals,
         Cheat_Menu.create_page_give_exp,
         Cheat_Menu.create_page_stats,
         Cheat_Menu.create_page_gold,
@@ -23,7 +21,6 @@ Cheat_Menu.register_pages = function () {
         Cheat_Menu.create_page_armors,
         Cheat_Menu.create_page_variables,
         Cheat_Menu.create_page_switches,
-        Cheat_Menu.create_page_speed,
         Cheat_Menu.create_page_save_recall,
         Cheat_Menu.create_page_teleport,
         Cheat_Menu.create_page_clear_states,
@@ -34,23 +31,31 @@ Cheat_Menu.register_pages = function () {
 Cheat_Menu.inject_ui_settings = function () {
     Cheat_Menu.menus.push(function () {
         Cheat_Menu.append_cheat_title("Quick Actions HUD");
-        Cheat_Menu.append_setting_row("Enable Taskbar HUD", Cheat_Menu.hud_config.enabled ? "ON" : "OFF", null,
+        Cheat_Menu.append_setting_row("Enable", Cheat_Menu.hud_config.enabled ? "ON" : "OFF", null,
             function () { Cheat_Menu.hud_config.enabled = !Cheat_Menu.hud_config.enabled; Cheat_Menu.update_menu(); }
         );
         if (Cheat_Menu.hud_config.enabled) {
-            Cheat_Menu.append_setting_row("Taskbar Position", Cheat_Menu.hud_config.position, null,
-                function () { Cheat_Menu.hud_config.position = Cheat_Menu.hud_config.position === 'Top' ? 'Bottom' : 'Top'; Cheat_Menu.update_menu(); }
-            );
-            Cheat_Menu.append_setting_row("HUD Opacity", Cheat_Menu.hud_config.opacity + "%",
+            Cheat_Menu.append_setting_row("Opacity", Cheat_Menu.hud_config.opacity + "%",
                 function () { Cheat_Menu.hud_config.opacity = Math.max(0, Cheat_Menu.hud_config.opacity - 10); Cheat_Menu.update_menu(); },
                 function () { Cheat_Menu.hud_config.opacity = Math.min(100, Cheat_Menu.hud_config.opacity + 10); Cheat_Menu.update_menu(); }
             );
-            Cheat_Menu.append_setting_row("HUD Font Size", Cheat_Menu.hud_config.fontSize + "px",
+            Cheat_Menu.append_setting_row("Font Size", Cheat_Menu.hud_config.fontSize + "px",
                 function () { Cheat_Menu.hud_config.fontSize = Math.max(8, Cheat_Menu.hud_config.fontSize - 1); Cheat_Menu.update_menu(); },
                 function () { Cheat_Menu.hud_config.fontSize = Math.min(24, Cheat_Menu.hud_config.fontSize + 1); Cheat_Menu.update_menu(); }
             );
+            var layoutLabel = Cheat_Menu.hud_config.layout === 'vertical' ? 'Vertical' : 'Horizontal';
+            Cheat_Menu.append_setting_row("Layout", layoutLabel,
+                function () { Cheat_Menu.hud_config.layout = 'vertical'; Cheat_Menu.update_menu(); },
+                function () { Cheat_Menu.hud_config.layout = 'horizontal'; Cheat_Menu.update_menu(); }
+            );
+            if (Cheat_Menu.hud_config.freePos) {
+                Cheat_Menu.append_cheat("Reset Position", "Reset", null, function () {
+                    Cheat_Menu.hud_config.freePos = null;
+                    Cheat_Menu.update_menu();
+                });
+            }
 
-            Cheat_Menu.append_title("Active HUD Buttons");
+            Cheat_Menu.append_title("Active Buttons");
             var grid = document.createElement('div');
             grid.className = "cheat_settings_grid";
             var keys = Object.keys(Cheat_Menu.hud_actions);
@@ -64,15 +69,19 @@ Cheat_Menu.inject_ui_settings = function () {
                 btn.style.backgroundColor = isActive ? "rgba(68, 204, 85, 0.3)" : "";
                 btn.style.borderColor = isActive ? "#44cc55" : "";
                 btn.innerHTML = Cheat_Menu.hud_actions[k].title;
-                btn.addEventListener('mousedown', function (e) {
-                    e.preventDefault();
-                    if (isActive) {
-                        Cheat_Menu.hud_config.active.splice(Cheat_Menu.hud_config.active.indexOf(k), 1);
-                    } else {
-                        Cheat_Menu.hud_config.active.push(k);
-                    }
-                    Cheat_Menu.update_menu();
-                });
+                (function (key, active) {
+                    var toggleButton = function (e) {
+                        e.preventDefault();
+                        if (active) {
+                            Cheat_Menu.hud_config.active.splice(Cheat_Menu.hud_config.active.indexOf(key), 1);
+                        } else {
+                            Cheat_Menu.hud_config.active.push(key);
+                        }
+                        Cheat_Menu.update_menu();
+                    };
+                    btn.addEventListener('mousedown', toggleButton);
+                    btn.addEventListener('touchstart', toggleButton, { passive: false });
+                })(k, isActive);
                 grid.appendChild(btn);
             }
             Cheat_Menu.content.appendChild(grid);
@@ -110,7 +119,7 @@ Cheat_Menu.group_menus_by_umbrella = function () {
         "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states"], items: [] },
         "Progression": { keys: ["exp", "stat", "gold"], items: [] },
         "Variables & Switches": { keys: ["variable", "switch"], items: [] },
-        "Movement": { keys: ["no clip", "speed", "noclip"], items: [] },
+        "Movement": { keys: ["movement", "no clip", "speed", "noclip"], items: [] },
         "Navigation": { keys: ["save and recall", "teleport", "recall"], items: [] },
         "Settings": { keys: ["settings", "interface", "quick actions hud", "general"], items: [] }
     };
@@ -160,7 +169,7 @@ Cheat_Menu.group_menus_by_umbrella = function () {
                 btn.innerHTML = items[j].name;
                 let idx = j;
 
-                btn.addEventListener('mousedown', function (e) {
+                var tabFn = function (e) {
                     e.preventDefault();
                     if (subIdx !== idx) {
                         Cheat_Menu.sub_tab_per_group[title] = idx;
@@ -168,7 +177,9 @@ Cheat_Menu.group_menus_by_umbrella = function () {
                         SoundManager.playSystemSound(0);
                         Cheat_Menu.update_menu();
                     }
-                });
+                };
+                btn.addEventListener('mousedown', tabFn);
+                btn.addEventListener('touchstart', tabFn, { passive: false });
 
                 nav.appendChild(btn);
             }
