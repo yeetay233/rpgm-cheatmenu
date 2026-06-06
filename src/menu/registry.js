@@ -7,15 +7,13 @@ Cheat_Menu.register_pages = function () {
     Cheat_Menu._pages_registered = true;
 
     // Register all menu pages (order determines sidebar position before grouping)
-    // Insert at front so menu order is as defined here
+    // NOTE: build.js determines which page files are included — only add functions
+    // whose source file is in the build's module list.
     Cheat_Menu.menus = [
+        Cheat_Menu.create_page_combat_vitals,
         Cheat_Menu.create_page_god_mode,
         Cheat_Menu.create_page_speed,
-        Cheat_Menu.create_page_enemy_hp,
-        Cheat_Menu.create_page_party_vitals,
-        Cheat_Menu.create_page_give_exp,
-        Cheat_Menu.create_page_stats,
-        Cheat_Menu.create_page_gold,
+        Cheat_Menu.create_page_progression,
         Cheat_Menu.create_page_items,
         Cheat_Menu.create_page_weapons,
         Cheat_Menu.create_page_armors,
@@ -26,9 +24,25 @@ Cheat_Menu.register_pages = function () {
         Cheat_Menu.create_page_clear_states,
         Cheat_Menu.create_page_general
     ];
+    Cheat_Menu._page_titles = [
+        "Combat",
+        "God Mode",
+        "Movement",
+        "Progression",
+        "Items",
+        "Weapons",
+        "Armors",
+        "Variables",
+        "Switches",
+        "Save and Recall",
+        "Teleport",
+        "Clear States",
+        "Interface"
+    ];
 };
 
 Cheat_Menu.inject_ui_settings = function () {
+    Cheat_Menu._page_titles.push("Quick Actions HUD");
     Cheat_Menu.menus.push(function () {
         Cheat_Menu.append_cheat_title("Quick Actions HUD");
         Cheat_Menu.append_setting_row("Enable", Cheat_Menu.hud_config.enabled ? "ON" : "OFF", null,
@@ -47,6 +61,37 @@ Cheat_Menu.inject_ui_settings = function () {
             Cheat_Menu.append_setting_row("Layout", layoutLabel,
                 function () { Cheat_Menu.hud_config.layout = 'vertical'; Cheat_Menu.update_menu(); },
                 function () { Cheat_Menu.hud_config.layout = 'horizontal'; Cheat_Menu.update_menu(); }
+            );
+            var posList = ['Top', 'Bottom', 'Left', 'Right'];
+            var posIdx = posList.indexOf(Cheat_Menu.hud_config.position);
+            if (posIdx === -1) posIdx = 0;
+            Cheat_Menu.append_setting_row("Position", Cheat_Menu.hud_config.position,
+                function () {
+                    var idx = posList.indexOf(Cheat_Menu.hud_config.position) - 1;
+                    if (idx < 0) idx = posList.length - 1;
+                    Cheat_Menu.hud_config.position = posList[idx];
+                    Cheat_Menu.hud_config.freePos = null;
+                    if (posList[idx] === 'Left' || posList[idx] === 'Right') {
+                        Cheat_Menu.hud_config.layout = 'vertical';
+                    } else {
+                        Cheat_Menu.hud_config.layout = 'horizontal';
+                    }
+                    Cheat_Menu.update_menu();
+                    Cheat_Menu.save_values();
+                },
+                function () {
+                    var idx = posList.indexOf(Cheat_Menu.hud_config.position) + 1;
+                    if (idx >= posList.length) idx = 0;
+                    Cheat_Menu.hud_config.position = posList[idx];
+                    Cheat_Menu.hud_config.freePos = null;
+                    if (posList[idx] === 'Left' || posList[idx] === 'Right') {
+                        Cheat_Menu.hud_config.layout = 'vertical';
+                    } else {
+                        Cheat_Menu.hud_config.layout = 'horizontal';
+                    }
+                    Cheat_Menu.update_menu();
+                    Cheat_Menu.save_values();
+                }
             );
             if (Cheat_Menu.hud_config.freePos) {
                 Cheat_Menu.append_cheat("Reset Position", "Reset", null, function () {
@@ -104,7 +149,8 @@ Cheat_Menu.group_menus_by_umbrella = function () {
         var len = rawNames.length;
         try { Cheat_Menu.menus[i](); } catch (e) { /* silent — skip broken page */ }
         if (rawNames.length === len) {
-            rawNames.push("Menu " + (i + 1));
+            var fallback = (Cheat_Menu._page_titles && Cheat_Menu._page_titles[i]) || ("Menu " + (i + 1));
+            rawNames.push(fallback);
         }
     }
 
@@ -116,8 +162,8 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
     var groups = {
         "Inventory": { keys: ["items", "weapon", "armor"], items: [] },
-        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states"], items: [] },
-        "Progression": { keys: ["exp", "stat", "gold"], items: [] },
+        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states", "combat"], items: [] },
+        "Progression": { keys: ["exp", "stat", "gold", "progression"], items: [] },
         "Variables & Switches": { keys: ["variable", "switch"], items: [] },
         "Movement": { keys: ["movement", "no clip", "speed", "noclip"], items: [] },
         "Navigation": { keys: ["save and recall", "teleport", "recall"], items: [] },
@@ -186,10 +232,13 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
             Cheat_Menu.content.appendChild(nav);
 
-            var old_append = Cheat_Menu.append_cheat_title;
-            Cheat_Menu.append_cheat_title = function () { };
-            items[subIdx].fn();
-            Cheat_Menu.append_cheat_title = old_append;
+            var entry = items[subIdx];
+            if (typeof entry.fn === 'function') {
+                var old_append = Cheat_Menu.append_cheat_title;
+                Cheat_Menu.append_cheat_title = function () { };
+                entry.fn();
+                Cheat_Menu.append_cheat_title = old_append;
+            }
         });
 
         newNames.push(title);

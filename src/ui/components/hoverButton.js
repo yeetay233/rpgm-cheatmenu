@@ -8,18 +8,25 @@ Cheat_Menu.render_hover_button = function () {
         Cheat_Menu.hover_btn.id = "cheat_hover_btn";
         Cheat_Menu.hover_btn.innerHTML = "★";
 
-        var hoverFn = function (e) {
-            e.stopPropagation();
-            e.preventDefault();
+        Cheat_Menu.addEvent(Cheat_Menu.hover_btn, function (e) {
             if (Cheat_Menu.cheat_menu_open) {
                 Cheat_Menu.close_menu();
             } else {
                 Cheat_Menu.open_menu();
                 Cheat_Menu.render_quick_hud();
             }
-        };
-        Cheat_Menu.hover_btn.addEventListener('mousedown', hoverFn);
-        Cheat_Menu.hover_btn.addEventListener('touchstart', hoverFn, { passive: false });
+        });
+
+        Cheat_Menu.hover_btn.addEventListener('touchstart', function (e) {
+            e.stopPropagation();
+        }, { passive: true });
+        Cheat_Menu.hover_btn.addEventListener('mousedown', function (e) {
+            e.stopPropagation();
+        });
+        Cheat_Menu.hover_btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
         document.body.appendChild(Cheat_Menu.hover_btn);
     }
 
@@ -33,6 +40,7 @@ Cheat_Menu.render_hover_button = function () {
     Cheat_Menu.hover_btn.style.width = Cheat_Menu.btn_config.size + "px";
     Cheat_Menu.hover_btn.style.height = Cheat_Menu.btn_config.size + "px";
     Cheat_Menu.hover_btn.style.fontSize = (Cheat_Menu.btn_config.size * 0.5) + "px";
+    Cheat_Menu.hover_btn.style.touchAction = "none";
 
     Cheat_Menu.hover_btn.style.left = "";
     Cheat_Menu.hover_btn.style.right = "";

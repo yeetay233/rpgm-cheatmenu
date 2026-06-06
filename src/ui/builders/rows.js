@@ -3,8 +3,31 @@
 // ============================================================
 
 Cheat_Menu.addEvent = function (el, handler) {
-    el.addEventListener('mousedown', handler);
-    el.addEventListener('touchstart', handler, { passive: false });
+    var sx = 0, sy = 0;
+    el.addEventListener('mousedown', function (e) {
+        sx = e.clientX;
+        sy = e.clientY;
+        e.preventDefault();
+    });
+    el.addEventListener('mouseup', function (e) {
+        var dx = e.clientX - sx;
+        var dy = e.clientY - sy;
+        if (Math.abs(dx) < Cheat_Menu.DRAG_THRESHOLD && Math.abs(dy) < Cheat_Menu.DRAG_THRESHOLD) {
+            handler(e);
+        }
+    });
+    el.addEventListener('touchstart', function (e) {
+        sx = e.changedTouches[0].clientX;
+        sy = e.changedTouches[0].clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', function (e) {
+        var dx = e.changedTouches[0].clientX - sx;
+        var dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) < Cheat_Menu.DRAG_THRESHOLD && Math.abs(dy) < Cheat_Menu.DRAG_THRESHOLD) {
+            e.preventDefault();
+            handler(e);
+        }
+    }, { passive: false });
 };
 
 Cheat_Menu.append_title = function (title) {

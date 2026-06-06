@@ -29,14 +29,12 @@ Cheat_Menu.create_page_enemy_hp = function () {
             btn.style.lineHeight = "1.3";
             btn.style.whiteSpace = "normal";
             btn.style.wordBreak = "break-word";
-            var ehFn = function (e) {
+            Cheat_Menu.addEvent(btn, function (e) {
                 e.preventDefault();
                 item.fn();
                 SoundManager.playSystemSound(1);
                 Cheat_Menu.update_menu();
-            };
-            btn.addEventListener('mousedown', ehFn);
-            btn.addEventListener('touchstart', ehFn, { passive: false });
+            });
 
             cell.appendChild(btn);
             grid.appendChild(cell);

@@ -74,10 +74,17 @@ Cheat_Menu.reset_to_initial = function () {
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
 };
 
+// Properties to never overwrite from save data (dynamically generated)
+Cheat_Menu._save_blacklist = [
+    'menus', 'menu_names', '_menus_grouped', '_pages_registered',
+    'sub_tab_per_group', 'list_state', '_page_titles'
+];
+
 // Load saved values from $gameSystem
 Cheat_Menu.load_saved_values = function () {
     if ($gameSystem && $gameSystem.Cheat_Menu) {
         for (var name in $gameSystem.Cheat_Menu) {
+            if (Cheat_Menu._save_blacklist.indexOf(name) !== -1) continue;
             Cheat_Menu[name] = Cheat_Menu.clone_save_value($gameSystem.Cheat_Menu[name]);
         }
     }

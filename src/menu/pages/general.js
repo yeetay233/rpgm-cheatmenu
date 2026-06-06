@@ -5,11 +5,6 @@
 Cheat_Menu.create_page_general = function () {
     Cheat_Menu.append_cheat_title("Interface");
 
-    Cheat_Menu.append_setting_row("Menu Scale Size", Cheat_Menu.menu_scale + "%",
-        function () { Cheat_Menu.menu_scale = Math.max(30, Cheat_Menu.menu_scale - 5); Cheat_Menu.update_menu(); },
-        function () { Cheat_Menu.menu_scale = Math.min(100, Cheat_Menu.menu_scale + 5); Cheat_Menu.update_menu(); }
-    );
-
     Cheat_Menu.append_scroll_selector("Menu Position: " + Cheat_Menu.positions[Cheat_Menu.position], null, null, function (dir) {
         if (dir === "left") {
             Cheat_Menu.position--;
@@ -27,6 +22,15 @@ Cheat_Menu.create_page_general = function () {
         else Cheat_Menu.fontSize = Math.min(24, Cheat_Menu.fontSize + 1);
         Cheat_Menu.overlay_box.style.fontSize = Cheat_Menu.fontSize + "px";
         SoundManager.playSystemSound(0);
+        Cheat_Menu.update_menu();
+    });
+
+    Cheat_Menu.append_scroll_selector("Menu Scale Size: " + Cheat_Menu.menu_scale + "%", null, null, function (dir) {
+        if (dir === "left") Cheat_Menu.menu_scale = Math.max(40, Cheat_Menu.menu_scale - 5);
+        else Cheat_Menu.menu_scale = Math.min(100, Cheat_Menu.menu_scale + 5);
+        Cheat_Menu.manual_menu_size = null;
+        SoundManager.playSystemSound(0);
+        Cheat_Menu.save_values();
         Cheat_Menu.update_menu();
     });
 
@@ -50,7 +54,4 @@ Cheat_Menu.create_page_general = function () {
         );
     }
 
-    Cheat_Menu.append_cheat("Close Menu", "Close", null, function () {
-        Cheat_Menu.close_menu();
-    });
 };

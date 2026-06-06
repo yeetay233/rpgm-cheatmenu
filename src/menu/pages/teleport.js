@@ -10,6 +10,8 @@ Cheat_Menu.create_page_teleport = function () {
         Cheat_Menu.teleport_location.m,
         function (idx) {
             Cheat_Menu.teleport_location.m = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -33,24 +35,22 @@ Cheat_Menu.create_page_teleport = function () {
 
     Cheat_Menu.append_scroll_selector("X: " + Cheat_Menu.teleport_location.x, null, null, Cheat_Menu.scroll_x_teleport_selection);
     Cheat_Menu.append_scroll_selector("Y: " + Cheat_Menu.teleport_location.y, null, null, Cheat_Menu.scroll_y_teleport_selection);
+    function tpAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); }
+    function tpClipAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); $gamePlayer._through = true; SoundManager.playSystemSound(1); }
     var tRow = document.createElement('div');
     tRow.className = "cheat_row";
     tRow.style.gap = "6px";
-    function tpAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); }
-    function tpClipAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); $gamePlayer._through = true; SoundManager.playSystemSound(1); }
     var tBtn = document.createElement('button');
     tBtn.className = "cheat_btn";
     tBtn.style.flex = "1";
     tBtn.innerHTML = "Activate";
-    tBtn.addEventListener('mousedown', tpAction);
-    tBtn.addEventListener('touchstart', tpAction, { passive: false });
+    Cheat_Menu.addEvent(tBtn, tpAction);
     tRow.appendChild(tBtn);
     var tnBtn = document.createElement('button');
     tnBtn.className = "cheat_btn";
     tnBtn.style.flex = "1";
     tnBtn.innerHTML = "TP+Clip";
-    tnBtn.addEventListener('mousedown', tpClipAction);
-    tnBtn.addEventListener('touchstart', tpClipAction, { passive: false });
+    Cheat_Menu.addEvent(tnBtn, tpClipAction);
     tRow.appendChild(tnBtn);
     Cheat_Menu.content.appendChild(tRow);
 };

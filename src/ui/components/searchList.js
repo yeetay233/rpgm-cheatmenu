@@ -74,12 +74,10 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
             }
 
             (function (idx) {
-                var selectFn = function (e) {
+                Cheat_Menu.addEvent(li, function (e) {
                     e.preventDefault();
                     onSelectCallback(idx);
-                };
-                li.addEventListener('mousedown', selectFn);
-                li.addEventListener('touchstart', selectFn, { passive: false });
+                });
             })(item.idx);
             listDiv.appendChild(li);
         }
@@ -123,8 +121,4 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
     container.appendChild(searchInput);
     container.appendChild(listDiv);
     Cheat_Menu.content.appendChild(container);
-
-    requestAnimationFrame(function () {
-        listDiv.scrollTop = Cheat_Menu.list_state.scroll;
-    });
 };

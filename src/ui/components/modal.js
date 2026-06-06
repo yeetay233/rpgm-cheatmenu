@@ -30,19 +30,15 @@ Cheat_Menu.open_value_modal = function (titleText, currentValue, onSave) {
     var btnRow = document.createElement('div');
     btnRow.className = "cheat_modal_buttons";
 
-    var cancelFn1 = function () { bg.remove(); };
-    var saveFn1 = function () { onSave(Number(input.value)); bg.remove(); };
     var btnCancel = document.createElement('button');
     btnCancel.className = "cheat_btn";
     btnCancel.innerHTML = "Cancel";
-    btnCancel.addEventListener('mousedown', cancelFn1);
-    btnCancel.addEventListener('touchstart', cancelFn1, { passive: false });
+    Cheat_Menu.addEvent(btnCancel, function () { bg.remove(); });
 
     var btnSave = document.createElement('button');
     btnSave.className = "cheat_btn";
     btnSave.innerHTML = "Save";
-    btnSave.addEventListener('mousedown', saveFn1);
-    btnSave.addEventListener('touchstart', saveFn1, { passive: false });
+    Cheat_Menu.addEvent(btnSave, function () { onSave(Number(input.value)); bg.remove(); });
 
     btnRow.appendChild(btnCancel);
     btnRow.appendChild(btnSave);
@@ -90,19 +86,15 @@ Cheat_Menu.open_text_modal = function (titleText, currentValue, onSave) {
     var btnRow = document.createElement('div');
     btnRow.className = "cheat_modal_buttons";
 
-    var cancelFn2 = function () { bg.remove(); };
-    var saveFn2 = function () { onSave(input.value); bg.remove(); };
     var btnCancel = document.createElement('button');
     btnCancel.className = "cheat_btn";
     btnCancel.innerHTML = "Cancel";
-    btnCancel.addEventListener('mousedown', cancelFn2);
-    btnCancel.addEventListener('touchstart', cancelFn2, { passive: false });
+    Cheat_Menu.addEvent(btnCancel, function () { bg.remove(); });
 
     var btnSave = document.createElement('button');
     btnSave.className = "cheat_btn";
     btnSave.innerHTML = "Save";
-    btnSave.addEventListener('mousedown', saveFn2);
-    btnSave.addEventListener('touchstart', saveFn2, { passive: false });
+    Cheat_Menu.addEvent(btnSave, function () { onSave(input.value); bg.remove(); });
 
     btnRow.appendChild(btnCancel);
     btnRow.appendChild(btnSave);
@@ -139,21 +131,17 @@ Cheat_Menu.open_confirm_modal = function (message, onConfirm) {
     var btnRow = document.createElement('div');
     btnRow.className = "cheat_modal_buttons";
 
-    var cancelFn3 = function () { bg.remove(); };
-    var confirmFn = function () { onConfirm(); bg.remove(); };
     var btnCancel = document.createElement('button');
     btnCancel.className = "cheat_btn";
     btnCancel.innerHTML = "Cancel";
-    btnCancel.addEventListener('mousedown', cancelFn3);
-    btnCancel.addEventListener('touchstart', cancelFn3, { passive: false });
+    Cheat_Menu.addEvent(btnCancel, function () { bg.remove(); });
 
     var btnConfirm = document.createElement('button');
     btnConfirm.className = "cheat_btn";
     btnConfirm.innerHTML = "Confirm";
     btnConfirm.style.borderColor = "#44cc55";
     btnConfirm.style.color = "#44cc55";
-    btnConfirm.addEventListener('mousedown', confirmFn);
-    btnConfirm.addEventListener('touchstart', confirmFn, { passive: false });
+    Cheat_Menu.addEvent(btnConfirm, function () { onConfirm(); bg.remove(); });
 
     btnRow.appendChild(btnCancel);
     btnRow.appendChild(btnConfirm);

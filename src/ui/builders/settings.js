@@ -10,7 +10,6 @@ Cheat_Menu.append_bottom_bar_controls = function (labelText, onZero, onApply) {
     label.className = "cheat_label";
     label.style.flex = "0 0 auto";
     label.style.fontSize = "0.85em";
-    label.style.marginRight = "4px";
     label.innerHTML = labelText;
 
     var amtSelector = document.createElement('div');

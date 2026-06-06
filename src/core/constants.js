@@ -67,7 +67,7 @@ Cheat_Menu.initial_values = {
         layout: 'horizontal',
         freePos: null,
         collapsed: false,
-        active: ['close_menu', 'party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
+        active: ['party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
     }
 };
 
@@ -87,7 +87,7 @@ Cheat_Menu.default_hud_config = {
     layout: 'horizontal',
     freePos: null,
     collapsed: false,
-    active: ['close_menu', 'party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
+    active: ['party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
 };
 
 // Scroll button step

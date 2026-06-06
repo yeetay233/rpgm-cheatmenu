@@ -42,6 +42,7 @@ DataManager.loadGame = function (savefileId) {
     Cheat_Menu.initialize();
     var result = DataManager.default_loadGame(savefileId);
     Cheat_Menu.load_saved_values();
+    Cheat_Menu.initialize_speed_lock();
     return result;
 };
 
@@ -64,6 +65,7 @@ window.addEventListener("resize", function () {
     if (Cheat_Menu.overlay_box && Cheat_Menu.cheat_menu_open) {
         Cheat_Menu.position_menu();
         Cheat_Menu.update_menu_size();
+        Cheat_Menu.refresh_scroll_buttons();
     }
 });
 
