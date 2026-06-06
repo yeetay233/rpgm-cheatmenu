@@ -2,7 +2,7 @@
 
 # Cheat Menu — RPG Maker MV/MZ
 
-![Version](https://img.shields.io/badge/version-8.0.0-44cc55?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.0.0-44cc55?style=flat-square)
 ![RPG Maker MV](https://img.shields.io/badge/RPG_Maker-MV-44cc55?style=flat-square)
 ![RPG Maker MZ](https://img.shields.io/badge/RPG_Maker-MZ-44cc55?style=flat-square)
 
