@@ -80,10 +80,17 @@ Cheat_Menu.reset_to_initial = function () {
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
 };
 
+// Properties to never overwrite from save data (dynamically generated)
+Cheat_Menu._save_blacklist = [
+    'menus', 'menu_names', '_menus_grouped', '_pages_registered',
+    'sub_tab_per_group', 'list_state', '_page_titles'
+];
+
 // Load saved values from $gameSystem
 Cheat_Menu.load_saved_values = function () {
     if ($gameSystem && $gameSystem.Cheat_Menu) {
         for (var name in $gameSystem.Cheat_Menu) {
+            if (Cheat_Menu._save_blacklist.indexOf(name) !== -1) continue;
             Cheat_Menu[name] = Cheat_Menu.clone_save_value($gameSystem.Cheat_Menu[name]);
         }
     }
@@ -609,6 +616,7 @@ Cheat_Menu._initResizeHandle = function () {
         if (typeof $gameSystem !== 'undefined' && $gameSystem) {
             Cheat_Menu.save_values();
         }
+        Cheat_Menu.refresh_scroll_buttons();
     }
 
     handle.addEventListener('mousedown', onStart);
@@ -939,10 +947,6 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
     container.appendChild(searchInput);
     container.appendChild(listDiv);
     Cheat_Menu.content.appendChild(container);
-
-    requestAnimationFrame(function () {
-        listDiv.scrollTop = Cheat_Menu.list_state.scroll;
-    });
 };
 
 
@@ -1087,50 +1091,39 @@ Cheat_Menu.render_quick_hud = function () {
     } else {
         var pos = Cheat_Menu.hud_config.position.toLowerCase();
         Cheat_Menu.quick_hud_el.style.transform = '';
+        Cheat_Menu.quick_hud_el.style.width = 'auto';
+        Cheat_Menu.quick_hud_el.style.border = 'none';
+        Cheat_Menu.quick_hud_el.style.borderRadius = '0';
         if (pos === 'top') {
             Cheat_Menu.quick_hud_el.style.left = '0';
-            Cheat_Menu.quick_hud_el.style.right = '';
+            Cheat_Menu.quick_hud_el.style.right = '0';
             Cheat_Menu.quick_hud_el.style.top = '0';
             Cheat_Menu.quick_hud_el.style.bottom = '';
-            Cheat_Menu.quick_hud_el.style.width = '100vw';
+            Cheat_Menu.quick_hud_el.style.marginLeft = 'auto';
+            Cheat_Menu.quick_hud_el.style.marginRight = 'auto';
         } else if (pos === 'bottom') {
             Cheat_Menu.quick_hud_el.style.left = '0';
-            Cheat_Menu.quick_hud_el.style.right = '';
+            Cheat_Menu.quick_hud_el.style.right = '0';
             Cheat_Menu.quick_hud_el.style.top = '';
             Cheat_Menu.quick_hud_el.style.bottom = '0';
-            Cheat_Menu.quick_hud_el.style.width = '100vw';
+            Cheat_Menu.quick_hud_el.style.marginLeft = 'auto';
+            Cheat_Menu.quick_hud_el.style.marginRight = 'auto';
         } else if (pos === 'left') {
             Cheat_Menu.quick_hud_el.style.left = '0';
             Cheat_Menu.quick_hud_el.style.right = '';
             Cheat_Menu.quick_hud_el.style.top = '50%';
             Cheat_Menu.quick_hud_el.style.bottom = '';
             Cheat_Menu.quick_hud_el.style.transform = 'translateY(-50%)';
-            Cheat_Menu.quick_hud_el.style.width = 'auto';
         } else if (pos === 'right') {
             Cheat_Menu.quick_hud_el.style.left = '';
             Cheat_Menu.quick_hud_el.style.right = '0';
             Cheat_Menu.quick_hud_el.style.top = '50%';
             Cheat_Menu.quick_hud_el.style.bottom = '';
             Cheat_Menu.quick_hud_el.style.transform = 'translateY(-50%)';
-            Cheat_Menu.quick_hud_el.style.width = 'auto';
         }
     }
     Cheat_Menu.quick_hud_el.style.maxWidth = isVertical ? '60px' : '90vw';
     Cheat_Menu.quick_hud_el.style.flexDirection = isVertical ? 'column' : 'row';
-
-    // Position-based border accent
-    var p = Cheat_Menu.hud_config.position.toLowerCase();
-    Cheat_Menu.quick_hud_el.style.border = 'none';
-    Cheat_Menu.quick_hud_el.style.borderRadius = '0';
-    if (p === 'top') {
-        Cheat_Menu.quick_hud_el.style.borderBottom = '1px solid rgba(68,204,85,0.2)';
-    } else if (p === 'bottom') {
-        Cheat_Menu.quick_hud_el.style.borderTop = '1px solid rgba(68,204,85,0.2)';
-    } else if (p === 'left') {
-        Cheat_Menu.quick_hud_el.style.borderRight = '1px solid rgba(68,204,85,0.2)';
-    } else if (p === 'right') {
-        Cheat_Menu.quick_hud_el.style.borderLeft = '1px solid rgba(68,204,85,0.2)';
-    }
 
     // Collapse/Expand button (hidden when menu open)
     if (!Cheat_Menu.cheat_menu_open) {
@@ -1139,7 +1132,7 @@ Cheat_Menu.render_quick_hud = function () {
         collapseBtn.type = 'button';
         collapseBtn.style.fontSize = Cheat_Menu.hud_config.fontSize + "px";
         collapseBtn.style.opacity = Cheat_Menu.hud_config.opacity / 100;
-        collapseBtn.innerHTML = isCollapsed ? "<span>+</span>" : "<span>-</span>";
+        collapseBtn.innerHTML = isCollapsed ? "<span>▶</span>" : "<span>▼</span>";
         var toggleCollapse = function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -1204,16 +1197,28 @@ Cheat_Menu.render_quick_hud = function () {
         e.preventDefault();
         e.stopPropagation();
         var el = Cheat_Menu.quick_hud_el;
-        // Migrate to fixed/auto layout immediately so offsets are accurate
+        // Measure current position BEFORE clearing margin/transform artifacts
+        var rect = el.getBoundingClientRect();
+        var cx = e.touches ? e.touches[0].clientX : e.clientX;
+        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+        // Clear all margin/transform artifacts from preset positioning
+        el.style.marginLeft = '';
+        el.style.marginRight = '';
+        el.style.marginTop = '';
+        el.style.marginBottom = '';
+        el.style.transform = '';
+        el.style.right = '';
+        el.style.bottom = '';
+        // Migrate to fixed/auto layout
         var isV = Cheat_Menu.hud_config.layout === 'vertical';
         el.style.position = 'fixed';
         el.style.width = 'auto';
         el.style.maxWidth = isV ? '60px' : '90vw';
         el.style.flexDirection = isV ? 'column' : 'row';
         el.className = '';
-        var rect = el.getBoundingClientRect();
-        var cx = e.touches ? e.touches[0].clientX : e.clientX;
-        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+        // Anchor at the pre-margin position so the element doesn't jump
+        el.style.left = rect.left + 'px';
+        el.style.top = rect.top + 'px';
         dragBtn._offsetX = cx - rect.left;
         dragBtn._offsetY = cy - rect.top;
         dragBtn._isDragging = true;
@@ -1227,6 +1232,14 @@ Cheat_Menu.render_quick_hud = function () {
         var cy = e.touches ? e.touches[0].clientY : e.clientY;
         var el = Cheat_Menu.quick_hud_el;
 
+        // Ensure no margin/transform artifacts remain during drag
+        el.style.marginLeft = '';
+        el.style.marginRight = '';
+        el.style.marginTop = '';
+        el.style.marginBottom = '';
+        el.style.transform = '';
+        el.style.right = '';
+        el.style.bottom = '';
         var isV = Cheat_Menu.hud_config.layout === 'vertical';
         el.style.position = 'fixed';
         el.style.width = 'auto';
@@ -1307,6 +1320,12 @@ Cheat_Menu.render_hover_button = function () {
         Cheat_Menu.hover_btn.addEventListener('touchstart', function (e) {
             e.stopPropagation();
         }, { passive: true });
+        Cheat_Menu.hover_btn.addEventListener('mousedown', function (e) {
+            e.stopPropagation();
+        });
+        Cheat_Menu.hover_btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
 
         document.body.appendChild(Cheat_Menu.hover_btn);
     }
@@ -2055,10 +2074,13 @@ Cheat_Menu.create_page_progression = function () {
     Cheat_Menu.append_actor_selection();
 
     // Stats
+    var statSection = document.createElement('div');
+    statSection.className = "cheat_progression_section";
+
     var statRow = document.createElement('div');
     statRow.className = "cheat_sub_header";
     statRow.innerHTML = "Stats";
-    Cheat_Menu.content.appendChild(statRow);
+    statSection.appendChild(statRow);
 
     var stat_string = "";
     if ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) {
@@ -2090,8 +2112,10 @@ Cheat_Menu.create_page_progression = function () {
     row.appendChild(btnL);
     row.appendChild(statLbl);
     row.appendChild(btnR);
-    Cheat_Menu.content.appendChild(row);
+    statSection.appendChild(row);
 
+    var prevContent = Cheat_Menu.content;
+    Cheat_Menu.content = statSection;
     var statQty = ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) ?
         $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus[Cheat_Menu.stat_selection] : 0;
     Cheat_Menu.append_bottom_bar_controls("Bonus: " + statQty,
@@ -2102,13 +2126,20 @@ Cheat_Menu.create_page_progression = function () {
         },
         Cheat_Menu.apply_current_stat
     );
+    Cheat_Menu.content = prevContent;
+    Cheat_Menu.content.appendChild(statSection);
 
     // EXP
+    var expSection = document.createElement('div');
+    expSection.className = "cheat_progression_section";
+
     var expHeader = document.createElement('div');
     expHeader.className = "cheat_sub_header";
     expHeader.innerHTML = "EXP";
-    Cheat_Menu.content.appendChild(expHeader);
+    expSection.appendChild(expHeader);
 
+    var prevContent2 = Cheat_Menu.content;
+    Cheat_Menu.content = expSection;
     var expQty = $gameActors._data[Cheat_Menu.cheat_selected_actor] ? $gameActors._data[Cheat_Menu.cheat_selected_actor].currentExp() : 0;
     Cheat_Menu.append_bottom_bar_controls("EXP: " + expQty,
         function () {
@@ -2120,13 +2151,20 @@ Cheat_Menu.create_page_progression = function () {
         },
         Cheat_Menu.apply_current_exp
     );
+    Cheat_Menu.content = prevContent2;
+    Cheat_Menu.content.appendChild(expSection);
 
     // Gold
+    var goldSection = document.createElement('div');
+    goldSection.className = "cheat_progression_section";
+
     var goldHeader = document.createElement('div');
     goldHeader.className = "cheat_sub_header";
     goldHeader.innerHTML = "Gold";
-    Cheat_Menu.content.appendChild(goldHeader);
+    goldSection.appendChild(goldHeader);
 
+    var prevContent3 = Cheat_Menu.content;
+    Cheat_Menu.content = goldSection;
     var goldQty = $gameParty._gold;
     Cheat_Menu.append_bottom_bar_controls("Gold: " + goldQty,
         function () {
@@ -2136,6 +2174,8 @@ Cheat_Menu.create_page_progression = function () {
         },
         Cheat_Menu.apply_current_gold
     );
+    Cheat_Menu.content = prevContent3;
+    Cheat_Menu.content.appendChild(goldSection);
 };
 
 Cheat_Menu.scroll_stat = function (direction) {
@@ -2283,6 +2323,8 @@ Cheat_Menu.create_page_items = function () {
         Cheat_Menu.item_selection,
         function (idx) {
             Cheat_Menu.item_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2325,6 +2367,8 @@ Cheat_Menu.create_page_weapons = function () {
         Cheat_Menu.weapon_selection,
         function (idx) {
             Cheat_Menu.weapon_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2367,6 +2411,8 @@ Cheat_Menu.create_page_armors = function () {
         Cheat_Menu.armor_selection,
         function (idx) {
             Cheat_Menu.armor_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2409,6 +2455,8 @@ Cheat_Menu.create_page_variables = function () {
         Cheat_Menu.variable_selection,
         function (idx) {
             Cheat_Menu.variable_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
 
@@ -2483,13 +2531,19 @@ Cheat_Menu.create_page_switches = function () {
         Cheat_Menu.switch_selection,
         function (idx) {
             Cheat_Menu.switch_selection = idx;
-            Cheat_Menu.toggle_switch(idx);
-            if ($gameSwitches.value(idx)) {
-                SoundManager.playSystemSound(1);
-            } else {
-                SoundManager.playSystemSound(2);
-            }
-            Cheat_Menu.update_menu();
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
+            var name = $dataSystem.switches[idx] || "Switch " + idx;
+            var currentVal = $gameSwitches.value(idx);
+            Cheat_Menu.open_confirm_modal("Toggle <b>" + name + "</b>?<br>Currently: <b>" + (currentVal ? "ON" : "OFF") + "</b>", function () {
+                Cheat_Menu.toggle_switch(idx);
+                if ($gameSwitches.value(idx)) {
+                    SoundManager.playSystemSound(1);
+                } else {
+                    SoundManager.playSystemSound(2);
+                }
+                Cheat_Menu.update_menu();
+            });
         },
         function (item, idx) { return item || "Switch " + idx; },
         true,
@@ -2605,6 +2659,8 @@ Cheat_Menu.create_page_teleport = function () {
         Cheat_Menu.teleport_location.m,
         function (idx) {
             Cheat_Menu.teleport_location.m = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2784,16 +2840,13 @@ Cheat_Menu.register_pages = function () {
     Cheat_Menu._pages_registered = true;
 
     // Register all menu pages (order determines sidebar position before grouping)
-    // Insert at front so menu order is as defined here
+    // NOTE: build.js determines which page files are included — only add functions
+    // whose source file is in the build's module list.
     Cheat_Menu.menus = [
         Cheat_Menu.create_page_combat_vitals,
         Cheat_Menu.create_page_god_mode,
         Cheat_Menu.create_page_speed,
-        Cheat_Menu.create_page_enemy_hp,
-        Cheat_Menu.create_page_party_vitals,
-        Cheat_Menu.create_page_give_exp,
-        Cheat_Menu.create_page_stats,
-        Cheat_Menu.create_page_gold,
+        Cheat_Menu.create_page_progression,
         Cheat_Menu.create_page_items,
         Cheat_Menu.create_page_weapons,
         Cheat_Menu.create_page_armors,
@@ -2804,9 +2857,25 @@ Cheat_Menu.register_pages = function () {
         Cheat_Menu.create_page_clear_states,
         Cheat_Menu.create_page_general
     ];
+    Cheat_Menu._page_titles = [
+        "Combat",
+        "God Mode",
+        "Movement",
+        "Progression",
+        "Items",
+        "Weapons",
+        "Armors",
+        "Variables",
+        "Switches",
+        "Save and Recall",
+        "Teleport",
+        "Clear States",
+        "Interface"
+    ];
 };
 
 Cheat_Menu.inject_ui_settings = function () {
+    Cheat_Menu._page_titles.push("Quick Actions HUD");
     Cheat_Menu.menus.push(function () {
         Cheat_Menu.append_cheat_title("Quick Actions HUD");
         Cheat_Menu.append_setting_row("Enable", Cheat_Menu.hud_config.enabled ? "ON" : "OFF", null,
@@ -2835,6 +2904,11 @@ Cheat_Menu.inject_ui_settings = function () {
                     if (idx < 0) idx = posList.length - 1;
                     Cheat_Menu.hud_config.position = posList[idx];
                     Cheat_Menu.hud_config.freePos = null;
+                    if (posList[idx] === 'Left' || posList[idx] === 'Right') {
+                        Cheat_Menu.hud_config.layout = 'vertical';
+                    } else {
+                        Cheat_Menu.hud_config.layout = 'horizontal';
+                    }
                     Cheat_Menu.update_menu();
                     Cheat_Menu.save_values();
                 },
@@ -2843,6 +2917,11 @@ Cheat_Menu.inject_ui_settings = function () {
                     if (idx >= posList.length) idx = 0;
                     Cheat_Menu.hud_config.position = posList[idx];
                     Cheat_Menu.hud_config.freePos = null;
+                    if (posList[idx] === 'Left' || posList[idx] === 'Right') {
+                        Cheat_Menu.hud_config.layout = 'vertical';
+                    } else {
+                        Cheat_Menu.hud_config.layout = 'horizontal';
+                    }
                     Cheat_Menu.update_menu();
                     Cheat_Menu.save_values();
                 }
@@ -2903,21 +2982,21 @@ Cheat_Menu.group_menus_by_umbrella = function () {
         var len = rawNames.length;
         try { Cheat_Menu.menus[i](); } catch (e) { /* silent — skip broken page */ }
         if (rawNames.length === len) {
-            rawNames.push("Menu " + (i + 1));
+            var fallback = (Cheat_Menu._page_titles && Cheat_Menu._page_titles[i]) || ("Menu " + (i + 1));
+            rawNames.push(fallback);
         }
     }
 
     Cheat_Menu.append_cheat_title = real_append;
     Cheat_Menu.content = old_content;
     Cheat_Menu._debug_rawNames = rawNames;
-    if (typeof console !== 'undefined') console.log('[CheatMenu] group rawNames:', JSON.stringify(rawNames));
 
     var rawMenus = Cheat_Menu.menus.slice();
 
     var groups = {
         "Inventory": { keys: ["items", "weapon", "armor"], items: [] },
         "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states", "combat"], items: [] },
-        "Progression": { keys: ["exp", "stat", "gold"], items: [] },
+        "Progression": { keys: ["exp", "stat", "gold", "progression"], items: [] },
         "Variables & Switches": { keys: ["variable", "switch"], items: [] },
         "Movement": { keys: ["movement", "no clip", "speed", "noclip"], items: [] },
         "Navigation": { keys: ["save and recall", "teleport", "recall"], items: [] },
@@ -2986,10 +3065,13 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
             Cheat_Menu.content.appendChild(nav);
 
-            var old_append = Cheat_Menu.append_cheat_title;
-            Cheat_Menu.append_cheat_title = function () { };
-            items[subIdx].fn();
-            Cheat_Menu.append_cheat_title = old_append;
+            var entry = items[subIdx];
+            if (typeof entry.fn === 'function') {
+                var old_append = Cheat_Menu.append_cheat_title;
+                Cheat_Menu.append_cheat_title = function () { };
+                entry.fn();
+                Cheat_Menu.append_cheat_title = old_append;
+            }
         });
 
         newNames.push(title);
@@ -3010,7 +3092,6 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
     Cheat_Menu.menus = newMenus;
     Cheat_Menu.menu_names = newNames;
-    if (typeof console !== 'undefined') console.log('[CheatMenu] sidebar names:', JSON.stringify(newNames));
 
     if (Cheat_Menu.cheat_selected >= Cheat_Menu.menus.length) {
         Cheat_Menu.cheat_selected = 0;
@@ -3085,6 +3166,7 @@ Cheat_Menu.update_menu = function () {
             var list = searchContainers[i].querySelector('.cheat_list');
             if (list) {
                 Cheat_Menu.add_list_scroll_buttons(list);
+                list.scrollTop = Cheat_Menu.list_state.scroll;
             }
         }
 
