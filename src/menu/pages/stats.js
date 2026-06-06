@@ -17,12 +17,10 @@ Cheat_Menu.create_page_stats = function () {
     var btnL = document.createElement('button');
     btnL.className = "cheat_btn";
     btnL.innerHTML = "◄ Stat";
-    var statLFn = function (e) {
+    Cheat_Menu.addEvent(btnL, function (e) {
         e.preventDefault();
         Cheat_Menu.scroll_stat("left");
-    };
-    btnL.addEventListener('mousedown', statLFn);
-    btnL.addEventListener('touchstart', statLFn, { passive: false });
+    });
     var statLbl = document.createElement('div');
     statLbl.className = "cheat_value";
     statLbl.innerHTML = stat_string;
@@ -30,12 +28,10 @@ Cheat_Menu.create_page_stats = function () {
     var btnR = document.createElement('button');
     btnR.className = "cheat_btn";
     btnR.innerHTML = "Stat ►";
-    var statRFn = function (e) {
+    Cheat_Menu.addEvent(btnR, function (e) {
         e.preventDefault();
         Cheat_Menu.scroll_stat("right");
-    };
-    btnR.addEventListener('mousedown', statRFn);
-    btnR.addEventListener('touchstart', statRFn, { passive: false });
+    });
     row.appendChild(btnL);
     row.appendChild(statLbl);
     row.appendChild(btnR);

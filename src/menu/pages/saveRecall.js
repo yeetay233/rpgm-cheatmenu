@@ -34,9 +34,7 @@ Cheat_Menu.create_page_save_recall = function () {
         btnSave.className = "cheat_btn";
         btnSave.innerHTML = "Save";
         btnSave.style.minWidth = "50px";
-        var saveFn = Cheat_Menu.save_position.bind(null, i);
-        btnSave.addEventListener('mousedown', saveFn);
-        btnSave.addEventListener('touchstart', saveFn, { passive: false });
+        Cheat_Menu.addEvent(btnSave, Cheat_Menu.save_position.bind(null, i));
 
         var btnRecall = document.createElement('button');
         btnRecall.className = "cheat_btn";
@@ -47,7 +45,7 @@ Cheat_Menu.create_page_save_recall = function () {
         } else {
             btnRecall.style.opacity = "0.4";
         }
-        var recallFn = function (slotIdx) {
+        Cheat_Menu.addEvent(btnRecall, (function (slotIdx) {
             return function (e) {
                 e.preventDefault();
                 var p = Cheat_Menu.saved_positions[slotIdx];
@@ -65,9 +63,7 @@ Cheat_Menu.create_page_save_recall = function () {
                     }
                 );
             };
-        }(i);
-        btnRecall.addEventListener('mousedown', recallFn);
-        btnRecall.addEventListener('touchstart', recallFn, { passive: false });
+        })(i));
 
         controls.appendChild(btnSave);
         controls.appendChild(btnRecall);

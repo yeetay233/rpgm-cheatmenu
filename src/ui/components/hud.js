@@ -137,28 +137,60 @@ Cheat_Menu.render_quick_hud = function () {
         Cheat_Menu.quick_hud_el.style.flexDirection = isVertical ? 'column' : 'row';
     } else {
         var pos = Cheat_Menu.hud_config.position.toLowerCase();
-        Cheat_Menu.quick_hud_el.className = pos;
-        Cheat_Menu.quick_hud_el.style.flexDirection = 'row';
-        Cheat_Menu.quick_hud_el.style.width = '100vw';
+        Cheat_Menu.quick_hud_el.style.transform = '';
+        Cheat_Menu.quick_hud_el.style.width = 'auto';
+        Cheat_Menu.quick_hud_el.style.border = 'none';
+        Cheat_Menu.quick_hud_el.style.borderRadius = '0';
+        if (pos === 'top') {
+            Cheat_Menu.quick_hud_el.style.left = '0';
+            Cheat_Menu.quick_hud_el.style.right = '0';
+            Cheat_Menu.quick_hud_el.style.top = '0';
+            Cheat_Menu.quick_hud_el.style.bottom = '';
+            Cheat_Menu.quick_hud_el.style.marginLeft = 'auto';
+            Cheat_Menu.quick_hud_el.style.marginRight = 'auto';
+        } else if (pos === 'bottom') {
+            Cheat_Menu.quick_hud_el.style.left = '0';
+            Cheat_Menu.quick_hud_el.style.right = '0';
+            Cheat_Menu.quick_hud_el.style.top = '';
+            Cheat_Menu.quick_hud_el.style.bottom = '0';
+            Cheat_Menu.quick_hud_el.style.marginLeft = 'auto';
+            Cheat_Menu.quick_hud_el.style.marginRight = 'auto';
+        } else if (pos === 'left') {
+            Cheat_Menu.quick_hud_el.style.left = '0';
+            Cheat_Menu.quick_hud_el.style.right = '';
+            Cheat_Menu.quick_hud_el.style.top = '50%';
+            Cheat_Menu.quick_hud_el.style.bottom = '';
+            Cheat_Menu.quick_hud_el.style.transform = 'translateY(-50%)';
+        } else if (pos === 'right') {
+            Cheat_Menu.quick_hud_el.style.left = '';
+            Cheat_Menu.quick_hud_el.style.right = '0';
+            Cheat_Menu.quick_hud_el.style.top = '50%';
+            Cheat_Menu.quick_hud_el.style.bottom = '';
+            Cheat_Menu.quick_hud_el.style.transform = 'translateY(-50%)';
+        }
     }
+    Cheat_Menu.quick_hud_el.style.maxWidth = isVertical ? '60px' : '90vw';
+    Cheat_Menu.quick_hud_el.style.flexDirection = isVertical ? 'column' : 'row';
 
-    // Collapse/Expand button (always first)
-    var collapseBtn = document.createElement('button');
-    collapseBtn.className = 'cheat_hud_btn cheat_hud_ctrl';
-    collapseBtn.type = 'button';
-    collapseBtn.style.fontSize = Cheat_Menu.hud_config.fontSize + "px";
-    collapseBtn.style.opacity = Cheat_Menu.hud_config.opacity / 100;
-    collapseBtn.innerHTML = isCollapsed ? "<span>+</span>" : "<span>-</span>";
-    var toggleCollapse = function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        Cheat_Menu.hud_config.collapsed = !Cheat_Menu.hud_config.collapsed;
-        Cheat_Menu.save_values();
-        Cheat_Menu.render_quick_hud();
-    };
-    collapseBtn.addEventListener('mousedown', toggleCollapse);
-    collapseBtn.addEventListener('touchstart', toggleCollapse, { passive: false });
-    Cheat_Menu.quick_hud_el.appendChild(collapseBtn);
+    // Collapse/Expand button (hidden when menu open)
+    if (!Cheat_Menu.cheat_menu_open) {
+        var collapseBtn = document.createElement('button');
+        collapseBtn.className = 'cheat_hud_btn cheat_hud_ctrl';
+        collapseBtn.type = 'button';
+        collapseBtn.style.fontSize = Cheat_Menu.hud_config.fontSize + "px";
+        collapseBtn.style.opacity = Cheat_Menu.hud_config.opacity / 100;
+        collapseBtn.innerHTML = isCollapsed ? "<span>▶</span>" : "<span>▼</span>";
+        var toggleCollapse = function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            Cheat_Menu.hud_config.collapsed = !Cheat_Menu.hud_config.collapsed;
+            Cheat_Menu.save_values();
+            Cheat_Menu.render_quick_hud();
+        };
+        collapseBtn.addEventListener('mousedown', toggleCollapse);
+        collapseBtn.addEventListener('touchstart', toggleCollapse, { passive: false });
+        Cheat_Menu.quick_hud_el.appendChild(collapseBtn);
+    }
 
     if (!isCollapsed) {
         for (var i = 0; i < Cheat_Menu.hud_config.active.length; i++) {
@@ -212,16 +244,28 @@ Cheat_Menu.render_quick_hud = function () {
         e.preventDefault();
         e.stopPropagation();
         var el = Cheat_Menu.quick_hud_el;
-        // Migrate to fixed/auto layout immediately so offsets are accurate
+        // Measure current position BEFORE clearing margin/transform artifacts
+        var rect = el.getBoundingClientRect();
+        var cx = e.touches ? e.touches[0].clientX : e.clientX;
+        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+        // Clear all margin/transform artifacts from preset positioning
+        el.style.marginLeft = '';
+        el.style.marginRight = '';
+        el.style.marginTop = '';
+        el.style.marginBottom = '';
+        el.style.transform = '';
+        el.style.right = '';
+        el.style.bottom = '';
+        // Migrate to fixed/auto layout
         var isV = Cheat_Menu.hud_config.layout === 'vertical';
         el.style.position = 'fixed';
         el.style.width = 'auto';
         el.style.maxWidth = isV ? '60px' : '90vw';
         el.style.flexDirection = isV ? 'column' : 'row';
         el.className = '';
-        var rect = el.getBoundingClientRect();
-        var cx = e.touches ? e.touches[0].clientX : e.clientX;
-        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+        // Anchor at the pre-margin position so the element doesn't jump
+        el.style.left = rect.left + 'px';
+        el.style.top = rect.top + 'px';
         dragBtn._offsetX = cx - rect.left;
         dragBtn._offsetY = cy - rect.top;
         dragBtn._isDragging = true;
@@ -235,6 +279,14 @@ Cheat_Menu.render_quick_hud = function () {
         var cy = e.touches ? e.touches[0].clientY : e.clientY;
         var el = Cheat_Menu.quick_hud_el;
 
+        // Ensure no margin/transform artifacts remain during drag
+        el.style.marginLeft = '';
+        el.style.marginRight = '';
+        el.style.marginTop = '';
+        el.style.marginBottom = '';
+        el.style.transform = '';
+        el.style.right = '';
+        el.style.bottom = '';
         var isV = Cheat_Menu.hud_config.layout === 'vertical';
         el.style.position = 'fixed';
         el.style.width = 'auto';

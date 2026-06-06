@@ -44,7 +44,6 @@ CHEAT MENU LAYOUT
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     padding: 6px;
-    padding-right: 30px;
 }
 
 /* =========================================================
@@ -85,7 +84,7 @@ TITLES / ROWS / COMMON CONTROLS
 ========================================================= */
 
 .cheat_menu_title {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-bottom: 3px;
     border-bottom: 1px solid #555;
     color: #44cc55;
@@ -101,7 +100,7 @@ TITLES / ROWS / COMMON CONTROLS
     justify-content: space-between;
     gap: 6px;
     margin-bottom: 4px;
-    padding: 4px;
+    padding: 4px 6px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
 }
@@ -122,7 +121,7 @@ TITLES / ROWS / COMMON CONTROLS
 
 .cheat_btn {
     padding: 4px 8px;
-    min-height: 36px;
+    min-height: 34px;
     min-width: 36px;
     background-color: #333;
     border: 1px solid #555;
@@ -148,7 +147,11 @@ TITLES / ROWS / COMMON CONTROLS
 
 .cheat_value {
     min-width: 36px;
+    min-height: 28px;
     padding: 3px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid #444;
     border-radius: 4px;
@@ -203,7 +206,6 @@ SEARCH / LISTS
     width: 100%;
     min-height: 100px;
     margin-bottom: 6px;
-    padding-right: 30px;
 }
 
 .cheat_search_input {
@@ -412,7 +414,7 @@ SUB TABS / UMBRELLA GROUPS
 }
 
 .cheat_sub_header {
-    margin: 8px 4px 4px 4px;
+    margin: 6px 4px 3px 4px;
     padding-bottom: 2px;
     border-bottom: 1px solid #44cc55;
     color: #44cc55;
@@ -420,6 +422,14 @@ SUB TABS / UMBRELLA GROUPS
     font-weight: bold;
     letter-spacing: 1px;
     text-transform: uppercase;
+}
+
+.cheat_progression_section {
+    margin: 6px 0;
+    padding: 4px 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid #333;
+    border-radius: 6px;
 }
 
 /* =========================================================
@@ -432,10 +442,10 @@ SETTINGS-SPECIFIC ROWS
     justify-content: space-between;
     gap: 6px;
     margin-bottom: 4px;
-    padding: 4px 8px;
+    padding: 4px 6px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #333;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 .cheat_setting_row .cheat_label {
@@ -455,7 +465,7 @@ SETTINGS-SPECIFIC ROWS
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 4px;
-    margin-top: 6px;
+    margin-top: 4px;
 }
 
 /* =========================================================
@@ -472,6 +482,7 @@ BOTTOM BAR / AMOUNT CONTROLS
     border-top: 1px solid #444;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
 }
 
 .cheat_bottom_bar .cheat_controls {
@@ -491,11 +502,13 @@ BOTTOM BAR / AMOUNT CONTROLS
     min-width: 30px;
     padding: 2px 4px;
     font-size: 0.85em;
+    min-height: 24px;
 }
 
 .cheat_bottom_bar .cheat_btn {
     min-height: 30px;
     font-size: 0.85em;
+    padding: 3px 6px;
 }
 
 /* =========================================================
@@ -506,7 +519,7 @@ ACTION GRID (Party Vitals / Enemy HP)
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 4px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .cheat_action_cell {
@@ -518,18 +531,25 @@ ACTION GRID (Party Vitals / Enemy HP)
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px 4px;
+    padding: 5px 4px;
     line-height: 1.3;
     white-space: normal;
     word-break: break-word;
-    min-height: 48px;
+    min-height: 46px;
     height: 100%;
 }
 
 .cheat_action_cell .cheat_btn small {
-    color: #888;
     font-size: 0.8em;
     margin-top: 2px;
+}
+
+.cheat_action_cell .cheat_btn small.tag-alive {
+    color: #66ccff;
+}
+
+.cheat_action_cell .cheat_btn small.tag-all {
+    color: #ff8844;
 }
 
 .cheat_action_cell .cheat_btn:active small {
@@ -640,38 +660,27 @@ QUICK HUD / HOVER BUTTON
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 3px;
-    width: 100vw;
-    padding: 2px;
-    background: transparent;
+    gap: 2px;
+    padding: 3px 4px;
     box-sizing: border-box;
     pointer-events: none;
-}
-
-#cheat_quick_hud.top {
-    top: 0;
-}
-
-#cheat_quick_hud.bottom {
-    bottom: 0;
 }
 
 .cheat_hud_btn {
     display: flex;
     align-items: center;
-    gap: 3px;
-    padding: 3px 6px;
-    min-height: 30px;
-    background: rgba(20, 20, 20, 0.8);
-    border: 1px solid #555;
-    border-radius: 6px;
-    color: #fff;
+    gap: 2px;
+    padding: 1px 5px;
+    min-height: 26px;
+    background: rgba(20, 20, 20, 0.75);
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #ddd;
     cursor: pointer;
     font-family: sans-serif;
-    font-size: 13px;
-    font-weight: bold;
+    font-size: 12px;
+    font-weight: 600;
     pointer-events: auto;
-    backdrop-filter: blur(4px);
     appearance: none;
     -webkit-appearance: none;
     touch-action: manipulation;
@@ -681,29 +690,31 @@ QUICK HUD / HOVER BUTTON
 }
 
 .cheat_hud_btn:hover {
-    background: rgba(68, 204, 85, 0.4) !important;
+    background: rgba(68, 204, 85, 0.35) !important;
     border-color: #44cc55;
+    color: #fff;
 }
 
 .cheat_hud_btn:active {
     background: rgba(68, 204, 85, 0.5) !important;
     border-color: #44cc55;
-}
-
-.cheat_hud_drag {
-    cursor: move;
-    flex-shrink: 0;
-    touch-action: none;
-}
-
-.cheat_hud_drag:active {
-    cursor: grabbing;
+    color: #fff;
 }
 
 .cheat_hud_ctrl {
     flex-shrink: 0;
-    margin: 0 4px;
+    min-width: 22px;
+    text-align: center;
+    padding: 1px 3px;
 }
+
+.cheat_hud_drag {
+    cursor: grab;
+}
+.cheat_hud_drag:active {
+    cursor: grabbing;
+}
+
 
 /* =========================================================
 CLOSE BUTTON
@@ -740,69 +751,6 @@ CLOSE BUTTON
 }
 
 /* =========================================================
-SCROLL ARROWS
-========================================================= */
-
-.cheat_scroll_arrow {
-    position: absolute;
-    right: 3px;
-    width: 24px;
-    height: 24px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 50%;
-    background: rgba(20, 20, 20, 0.94);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: bold;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 120;
-    user-select: none;
-    -webkit-user-select: none;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.cheat_scroll_arrow.up {
-    top: 4px;
-}
-
-.cheat_scroll_arrow.down {
-    bottom: 4px;
-}
-
-#cheat_menu>.cheat_scroll_arrow.up {
-    top: 44px;
-    right: 6px;
-}
-
-#cheat_menu>.cheat_scroll_arrow.down {
-    bottom: 6px;
-    right: 6px;
-}
-
-.cheat_search_container>.cheat_scroll_arrow.up {
-    top: 44px;
-}
-
-.cheat_search_container>.cheat_scroll_arrow.down {
-    bottom: 4px;
-}
-
-.cheat_scroll_arrow:hover,
-.cheat_scroll_arrow:active {
-    background: rgba(68, 204, 85, 0.32);
-    border-color: #44cc55;
-    color: #ffffff;
-}
-
-/* =========================================================
 SCROLLBARS
 ========================================================= */
 
@@ -821,6 +769,127 @@ SCROLLBARS
 
 ::-webkit-scrollbar-thumb:hover {
     background: #777;
+}
+
+/* =========================================================
+SCROLL BUTTONS — sidebar/content sticky in-flow ▲/▼
+========================================================= */
+
+.cheat_scroll_btn {
+    position: sticky;
+    z-index: 5;
+    flex-shrink: 0;
+    display: block;
+    width: 30%;
+    height: 25px;
+    min-height: 25px;
+    padding: 0 8px;
+    margin: 0 auto;
+    background: #333;
+    border: none;
+    outline: 1px solid rgba(68, 204, 85, 0.4);
+    color: #aaa;
+    cursor: pointer;
+    font-size: 9px;
+    line-height: 25px;
+    text-align: center;
+    box-sizing: border-box;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    opacity: 0;
+}
+
+.cheat_scroll_btn:hover,
+.cheat_scroll_btn:active {
+    background: #444;
+    color: #44cc55;
+}
+
+.scb_up {
+    top: 0;
+    border-bottom: 1px solid #333;
+}
+
+.scb_down {
+    bottom: 0;
+    border-top: 1px solid #333;
+}
+
+/* =========================================================
+LIST SCROLL COLUMN — 30px right-side bar for .cheat_list
+========================================================= */
+
+.cheat_list_wrapper {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.cheat_list_wrapper > .cheat_list {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 0;
+    border-right: none;
+}
+
+/* Sidebar columnized layout */
+#cheat_menu_sidebar.cheat_sb_row {
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.cheat_sb_content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Scroll column — shared by sidebar and lists */
+.cheat_scroll_column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    flex-shrink: 0;
+    background: #151515;
+    border-left: 1px solid #333;
+}
+
+.cheat_scroll_column .cheat_scroll_col_btn {
+    flex: 0 0 35%;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: #333;
+    border: none;
+    border-bottom: 1px solid #333;
+    outline: 1px solid rgba(68, 204, 85, 0.4);
+    color: #aaa;
+    cursor: pointer;
+    font-size: 10px;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    opacity: 0;
+}
+
+.cheat_scroll_column .cheat_scroll_col_btn:last-child {
+    border-bottom: none;
+}
+
+.cheat_scroll_column .cheat_scroll_col_btn:hover,
+.cheat_scroll_column .cheat_scroll_col_btn:active {
+    background: rgba(68, 204, 85, 0.12);
+    color: #44cc55;
 }
 
 /* =========================================================
@@ -857,7 +926,7 @@ RESPONSIVE — narrow screens (JoiPlay / mobile)
     .cheat_setting_row {
         flex-wrap: wrap;
         align-items: flex-start;
-        padding: 3px;
+        padding: 3px 5px;
         margin-bottom: 3px;
     }
 
@@ -869,13 +938,14 @@ RESPONSIVE — narrow screens (JoiPlay / mobile)
 
     .cheat_btn {
         padding: 3px 6px;
-        min-height: 32px;
-        min-width: 32px;
+        min-height: 30px;
+        min-width: 30px;
         font-size: 0.85em;
     }
 
     .cheat_value {
-        min-width: 30px;
+        min-width: 28px;
+        min-height: 24px;
         padding: 2px 4px;
         font-size: 0.85em;
     }
@@ -952,21 +1022,6 @@ RESPONSIVE — narrow screens (JoiPlay / mobile)
         height: 8px;
     }
 
-    .cheat_scroll_arrow {
-        width: 20px;
-        height: 20px;
-        font-size: 9px;
-        right: 2px;
-    }
-
-    .cheat_scroll_arrow.up {
-        top: 3px;
-    }
-
-    .cheat_scroll_arrow.down {
-        bottom: 3px;
-    }
-
     .cheat_bottom_bar {
         gap: 3px;
         margin-top: 3px;
@@ -979,13 +1034,23 @@ RESPONSIVE — narrow screens (JoiPlay / mobile)
         margin-right: 0;
     }
 
+    .cheat_bottom_bar .cheat_controls {
+        flex-shrink: 1;
+        flex-wrap: wrap;
+    }
+
+    .cheat_bottom_bar .cheat_controls .cheat_btn {
+        flex: 0 1 auto;
+        min-width: 0;
+    }
+
     .cheat_action_grid {
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 3px;
     }
 
     .cheat_action_cell .cheat_btn {
-        min-height: 40px;
+        min-height: 38px;
         padding: 4px 3px;
         font-size: 0.85em;
     }
@@ -1001,6 +1066,11 @@ EXTRA SMALL — tiny phones (360px and below)
 ========================================================= */
 
 @media screen and (max-width: 360px) {
+    .cheat_bottom_bar .cheat_controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
     #cheat_menu_sidebar {
         width: 90px;
     }
@@ -1029,14 +1099,14 @@ EXTRA SMALL — tiny phones (360px and below)
 
     .cheat_btn {
         padding: 2px 5px;
-        min-height: 28px;
-        min-width: 28px;
+        min-height: 26px;
+        min-width: 26px;
         font-size: 0.8em;
     }
 
     .cheat_row,
     .cheat_setting_row {
-        padding: 2px;
+        padding: 2px 4px;
         margin-bottom: 2px;
         gap: 3px;
     }
@@ -1062,12 +1132,8 @@ EXTRA SMALL — tiny phones (360px and below)
     }
 
     .cheat_action_cell .cheat_btn {
-        min-height: 36px;
+        min-height: 34px;
         padding: 3px 2px;
         font-size: 0.8em;
-    }
-
-    .cheat_scroll_arrow {
-        display: none;
     }
 }

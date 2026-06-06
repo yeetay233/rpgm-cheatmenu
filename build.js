@@ -33,6 +33,7 @@ var modules = [
     'ui/components/searchList.js',
     'ui/components/hud.js',
     'ui/components/hoverButton.js',
+    'ui/components/scrollButtons.js',
 
     // UI Builders
     'ui/builders/rows.js',
@@ -40,14 +41,11 @@ var modules = [
 
     // Menu Pages
     'menu/pages/sharedHandlers.js',
+    'menu/pages/combatVitals.js',
     'menu/pages/godMode.js',
+    'menu/pages/progression.js',
 
-    'menu/pages/enemyHp.js',
-    'menu/pages/partyVitals.js',
     'menu/pages/speed.js',
-    'menu/pages/giveExp.js',
-    'menu/pages/stats.js',
-    'menu/pages/gold.js',
     'menu/pages/items.js',
     'menu/pages/weapons.js',
     'menu/pages/armors.js',
@@ -64,7 +62,6 @@ var modules = [
 
     // Input
     'input/keyboard.js',
-    'input/dragScroll.js',
 
     // Init (last - hooks into game engine)
     'core/init.js'

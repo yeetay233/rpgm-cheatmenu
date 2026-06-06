@@ -4,6 +4,7 @@
 
 Cheat_Menu.create_page_speed = function () {
     Cheat_Menu.append_cheat_title("Movement");
+    Cheat_Menu.initialize_speed_lock();
 
     Cheat_Menu.append_title("Speed");
     var presets = [
@@ -23,14 +24,12 @@ Cheat_Menu.create_page_speed = function () {
             btn.style.minWidth = "60px";
             btn.style.flex = "1";
             btn.innerHTML = p.label;
-            var presetFn = function (e) {
+            Cheat_Menu.addEvent(btn, function (e) {
                 e.preventDefault();
                 Cheat_Menu.change_player_speed(p.speed - $gamePlayer._moveSpeed);
                 SoundManager.playSystemSound(1);
                 Cheat_Menu.update_menu();
-            };
-            btn.addEventListener('mousedown', presetFn);
-            btn.addEventListener('touchstart', presetFn, { passive: false });
+            });
             row.appendChild(btn);
         })(presets[i]);
     }

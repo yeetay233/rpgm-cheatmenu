@@ -80,10 +80,17 @@ Cheat_Menu.reset_to_initial = function () {
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
 };
 
+// Properties to never overwrite from save data (dynamically generated)
+Cheat_Menu._save_blacklist = [
+    'menus', 'menu_names', '_menus_grouped', '_pages_registered',
+    'sub_tab_per_group', 'list_state', '_page_titles'
+];
+
 // Load saved values from $gameSystem
 Cheat_Menu.load_saved_values = function () {
     if ($gameSystem && $gameSystem.Cheat_Menu) {
         for (var name in $gameSystem.Cheat_Menu) {
+            if (Cheat_Menu._save_blacklist.indexOf(name) !== -1) continue;
             Cheat_Menu[name] = Cheat_Menu.clone_save_value($gameSystem.Cheat_Menu[name]);
         }
     }
@@ -178,7 +185,7 @@ Cheat_Menu.initial_values = {
         layout: 'horizontal',
         freePos: null,
         collapsed: false,
-        active: ['close_menu', 'party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
+        active: ['party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
     }
 };
 
@@ -198,7 +205,7 @@ Cheat_Menu.default_hud_config = {
     layout: 'horizontal',
     freePos: null,
     collapsed: false,
-    active: ['close_menu', 'party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
+    active: ['party_full_hp', 'enemy_hp_0', 'toggle_noclip', 'open_inv', 'open_vars']
 };
 
 // Scroll button step
@@ -609,6 +616,7 @@ Cheat_Menu._initResizeHandle = function () {
         if (typeof $gameSystem !== 'undefined' && $gameSystem) {
             Cheat_Menu.save_values();
         }
+        Cheat_Menu.refresh_scroll_buttons();
     }
 
     handle.addEventListener('mousedown', onStart);
@@ -687,19 +695,15 @@ Cheat_Menu.open_value_modal = function (titleText, currentValue, onSave) {
     var btnRow = document.createElement('div');
     btnRow.className = "cheat_modal_buttons";
 
-    var cancelFn1 = function () { bg.remove(); };
-    var saveFn1 = function () { onSave(Number(input.value)); bg.remove(); };
     var btnCancel = document.createElement('button');
     btnCancel.className = "cheat_btn";
     btnCancel.innerHTML = "Cancel";
-    btnCancel.addEventListener('mousedown', cancelFn1);
-    btnCancel.addEventListener('touchstart', cancelFn1, { passive: false });
+    Cheat_Menu.addEvent(btnCancel, function () { bg.remove(); });
 
     var btnSave = document.createElement('button');
     btnSave.className = "cheat_btn";
     btnSave.innerHTML = "Save";
-    btnSave.addEventListener('mousedown', saveFn1);
-    btnSave.addEventListener('touchstart', saveFn1, { passive: false });
+    Cheat_Menu.addEvent(btnSave, function () { onSave(Number(input.value)); bg.remove(); });
 
     btnRow.appendChild(btnCancel);
     btnRow.appendChild(btnSave);
@@ -747,19 +751,15 @@ Cheat_Menu.open_text_modal = function (titleText, currentValue, onSave) {
     var btnRow = document.createElement('div');
     btnRow.className = "cheat_modal_buttons";
 
-    var cancelFn2 = function () { bg.remove(); };
-    var saveFn2 = function () { onSave(input.value); bg.remove(); };
     var btnCancel = document.createElement('button');
     btnCancel.className = "cheat_btn";
     btnCancel.innerHTML = "Cancel";
-    btnCancel.addEventListener('mousedown', cancelFn2);
-    btnCancel.addEventListener('touchstart', cancelFn2, { passive: false });
+    Cheat_Menu.addEvent(btnCancel, function () { bg.remove(); });
 
     var btnSave = document.createElement('button');
     btnSave.className = "cheat_btn";
     btnSave.innerHTML = "Save";
-    btnSave.addEventListener('mousedown', saveFn2);
-    btnSave.addEventListener('touchstart', saveFn2, { passive: false });
+    Cheat_Menu.addEvent(btnSave, function () { onSave(input.value); bg.remove(); });
 
     btnRow.appendChild(btnCancel);
     btnRow.appendChild(btnSave);
@@ -796,21 +796,17 @@ Cheat_Menu.open_confirm_modal = function (message, onConfirm) {
     var btnRow = document.createElement('div');
     btnRow.className = "cheat_modal_buttons";
 
-    var cancelFn3 = function () { bg.remove(); };
-    var confirmFn = function () { onConfirm(); bg.remove(); };
     var btnCancel = document.createElement('button');
     btnCancel.className = "cheat_btn";
     btnCancel.innerHTML = "Cancel";
-    btnCancel.addEventListener('mousedown', cancelFn3);
-    btnCancel.addEventListener('touchstart', cancelFn3, { passive: false });
+    Cheat_Menu.addEvent(btnCancel, function () { bg.remove(); });
 
     var btnConfirm = document.createElement('button');
     btnConfirm.className = "cheat_btn";
     btnConfirm.innerHTML = "Confirm";
     btnConfirm.style.borderColor = "#44cc55";
     btnConfirm.style.color = "#44cc55";
-    btnConfirm.addEventListener('mousedown', confirmFn);
-    btnConfirm.addEventListener('touchstart', confirmFn, { passive: false });
+    Cheat_Menu.addEvent(btnConfirm, function () { onConfirm(); bg.remove(); });
 
     btnRow.appendChild(btnCancel);
     btnRow.appendChild(btnConfirm);
@@ -825,6 +821,7 @@ Cheat_Menu.open_confirm_modal = function (message, onConfirm) {
 
     Cheat_Menu.overlay_box.appendChild(bg);
 };
+
 
 // Source: ui/components/searchList.js
 // ============================================================
@@ -903,12 +900,10 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
             }
 
             (function (idx) {
-                var selectFn = function (e) {
+                Cheat_Menu.addEvent(li, function (e) {
                     e.preventDefault();
                     onSelectCallback(idx);
-                };
-                li.addEventListener('mousedown', selectFn);
-                li.addEventListener('touchstart', selectFn, { passive: false });
+                });
             })(item.idx);
             listDiv.appendChild(li);
         }
@@ -952,10 +947,6 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
     container.appendChild(searchInput);
     container.appendChild(listDiv);
     Cheat_Menu.content.appendChild(container);
-
-    requestAnimationFrame(function () {
-        listDiv.scrollTop = Cheat_Menu.list_state.scroll;
-    });
 };
 
 
@@ -1099,28 +1090,60 @@ Cheat_Menu.render_quick_hud = function () {
         Cheat_Menu.quick_hud_el.style.flexDirection = isVertical ? 'column' : 'row';
     } else {
         var pos = Cheat_Menu.hud_config.position.toLowerCase();
-        Cheat_Menu.quick_hud_el.className = pos;
-        Cheat_Menu.quick_hud_el.style.flexDirection = 'row';
-        Cheat_Menu.quick_hud_el.style.width = '100vw';
+        Cheat_Menu.quick_hud_el.style.transform = '';
+        Cheat_Menu.quick_hud_el.style.width = 'auto';
+        Cheat_Menu.quick_hud_el.style.border = 'none';
+        Cheat_Menu.quick_hud_el.style.borderRadius = '0';
+        if (pos === 'top') {
+            Cheat_Menu.quick_hud_el.style.left = '0';
+            Cheat_Menu.quick_hud_el.style.right = '0';
+            Cheat_Menu.quick_hud_el.style.top = '0';
+            Cheat_Menu.quick_hud_el.style.bottom = '';
+            Cheat_Menu.quick_hud_el.style.marginLeft = 'auto';
+            Cheat_Menu.quick_hud_el.style.marginRight = 'auto';
+        } else if (pos === 'bottom') {
+            Cheat_Menu.quick_hud_el.style.left = '0';
+            Cheat_Menu.quick_hud_el.style.right = '0';
+            Cheat_Menu.quick_hud_el.style.top = '';
+            Cheat_Menu.quick_hud_el.style.bottom = '0';
+            Cheat_Menu.quick_hud_el.style.marginLeft = 'auto';
+            Cheat_Menu.quick_hud_el.style.marginRight = 'auto';
+        } else if (pos === 'left') {
+            Cheat_Menu.quick_hud_el.style.left = '0';
+            Cheat_Menu.quick_hud_el.style.right = '';
+            Cheat_Menu.quick_hud_el.style.top = '50%';
+            Cheat_Menu.quick_hud_el.style.bottom = '';
+            Cheat_Menu.quick_hud_el.style.transform = 'translateY(-50%)';
+        } else if (pos === 'right') {
+            Cheat_Menu.quick_hud_el.style.left = '';
+            Cheat_Menu.quick_hud_el.style.right = '0';
+            Cheat_Menu.quick_hud_el.style.top = '50%';
+            Cheat_Menu.quick_hud_el.style.bottom = '';
+            Cheat_Menu.quick_hud_el.style.transform = 'translateY(-50%)';
+        }
     }
+    Cheat_Menu.quick_hud_el.style.maxWidth = isVertical ? '60px' : '90vw';
+    Cheat_Menu.quick_hud_el.style.flexDirection = isVertical ? 'column' : 'row';
 
-    // Collapse/Expand button (always first)
-    var collapseBtn = document.createElement('button');
-    collapseBtn.className = 'cheat_hud_btn cheat_hud_ctrl';
-    collapseBtn.type = 'button';
-    collapseBtn.style.fontSize = Cheat_Menu.hud_config.fontSize + "px";
-    collapseBtn.style.opacity = Cheat_Menu.hud_config.opacity / 100;
-    collapseBtn.innerHTML = isCollapsed ? "<span>+</span>" : "<span>-</span>";
-    var toggleCollapse = function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        Cheat_Menu.hud_config.collapsed = !Cheat_Menu.hud_config.collapsed;
-        Cheat_Menu.save_values();
-        Cheat_Menu.render_quick_hud();
-    };
-    collapseBtn.addEventListener('mousedown', toggleCollapse);
-    collapseBtn.addEventListener('touchstart', toggleCollapse, { passive: false });
-    Cheat_Menu.quick_hud_el.appendChild(collapseBtn);
+    // Collapse/Expand button (hidden when menu open)
+    if (!Cheat_Menu.cheat_menu_open) {
+        var collapseBtn = document.createElement('button');
+        collapseBtn.className = 'cheat_hud_btn cheat_hud_ctrl';
+        collapseBtn.type = 'button';
+        collapseBtn.style.fontSize = Cheat_Menu.hud_config.fontSize + "px";
+        collapseBtn.style.opacity = Cheat_Menu.hud_config.opacity / 100;
+        collapseBtn.innerHTML = isCollapsed ? "<span>▶</span>" : "<span>▼</span>";
+        var toggleCollapse = function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            Cheat_Menu.hud_config.collapsed = !Cheat_Menu.hud_config.collapsed;
+            Cheat_Menu.save_values();
+            Cheat_Menu.render_quick_hud();
+        };
+        collapseBtn.addEventListener('mousedown', toggleCollapse);
+        collapseBtn.addEventListener('touchstart', toggleCollapse, { passive: false });
+        Cheat_Menu.quick_hud_el.appendChild(collapseBtn);
+    }
 
     if (!isCollapsed) {
         for (var i = 0; i < Cheat_Menu.hud_config.active.length; i++) {
@@ -1174,16 +1197,28 @@ Cheat_Menu.render_quick_hud = function () {
         e.preventDefault();
         e.stopPropagation();
         var el = Cheat_Menu.quick_hud_el;
-        // Migrate to fixed/auto layout immediately so offsets are accurate
+        // Measure current position BEFORE clearing margin/transform artifacts
+        var rect = el.getBoundingClientRect();
+        var cx = e.touches ? e.touches[0].clientX : e.clientX;
+        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+        // Clear all margin/transform artifacts from preset positioning
+        el.style.marginLeft = '';
+        el.style.marginRight = '';
+        el.style.marginTop = '';
+        el.style.marginBottom = '';
+        el.style.transform = '';
+        el.style.right = '';
+        el.style.bottom = '';
+        // Migrate to fixed/auto layout
         var isV = Cheat_Menu.hud_config.layout === 'vertical';
         el.style.position = 'fixed';
         el.style.width = 'auto';
         el.style.maxWidth = isV ? '60px' : '90vw';
         el.style.flexDirection = isV ? 'column' : 'row';
         el.className = '';
-        var rect = el.getBoundingClientRect();
-        var cx = e.touches ? e.touches[0].clientX : e.clientX;
-        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+        // Anchor at the pre-margin position so the element doesn't jump
+        el.style.left = rect.left + 'px';
+        el.style.top = rect.top + 'px';
         dragBtn._offsetX = cx - rect.left;
         dragBtn._offsetY = cy - rect.top;
         dragBtn._isDragging = true;
@@ -1197,6 +1232,14 @@ Cheat_Menu.render_quick_hud = function () {
         var cy = e.touches ? e.touches[0].clientY : e.clientY;
         var el = Cheat_Menu.quick_hud_el;
 
+        // Ensure no margin/transform artifacts remain during drag
+        el.style.marginLeft = '';
+        el.style.marginRight = '';
+        el.style.marginTop = '';
+        el.style.marginBottom = '';
+        el.style.transform = '';
+        el.style.right = '';
+        el.style.bottom = '';
         var isV = Cheat_Menu.hud_config.layout === 'vertical';
         el.style.position = 'fixed';
         el.style.width = 'auto';
@@ -1265,18 +1308,25 @@ Cheat_Menu.render_hover_button = function () {
         Cheat_Menu.hover_btn.id = "cheat_hover_btn";
         Cheat_Menu.hover_btn.innerHTML = "★";
 
-        var hoverFn = function (e) {
-            e.stopPropagation();
-            e.preventDefault();
+        Cheat_Menu.addEvent(Cheat_Menu.hover_btn, function (e) {
             if (Cheat_Menu.cheat_menu_open) {
                 Cheat_Menu.close_menu();
             } else {
                 Cheat_Menu.open_menu();
                 Cheat_Menu.render_quick_hud();
             }
-        };
-        Cheat_Menu.hover_btn.addEventListener('mousedown', hoverFn);
-        Cheat_Menu.hover_btn.addEventListener('touchstart', hoverFn, { passive: false });
+        });
+
+        Cheat_Menu.hover_btn.addEventListener('touchstart', function (e) {
+            e.stopPropagation();
+        }, { passive: true });
+        Cheat_Menu.hover_btn.addEventListener('mousedown', function (e) {
+            e.stopPropagation();
+        });
+        Cheat_Menu.hover_btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
         document.body.appendChild(Cheat_Menu.hover_btn);
     }
 
@@ -1290,6 +1340,7 @@ Cheat_Menu.render_hover_button = function () {
     Cheat_Menu.hover_btn.style.width = Cheat_Menu.btn_config.size + "px";
     Cheat_Menu.hover_btn.style.height = Cheat_Menu.btn_config.size + "px";
     Cheat_Menu.hover_btn.style.fontSize = (Cheat_Menu.btn_config.size * 0.5) + "px";
+    Cheat_Menu.hover_btn.style.touchAction = "none";
 
     Cheat_Menu.hover_btn.style.left = "";
     Cheat_Menu.hover_btn.style.right = "";
@@ -1322,14 +1373,230 @@ Cheat_Menu.render_hover_button = function () {
     }
 };
 
+
+// Source: ui/components/scrollButtons.js
+// ============================================================
+// Cheat Menu - Scroll Up/Down Buttons
+//
+// Sidebar / lists : scroll-column on the right side
+// Content         : sticky in-flow ▲/▼ (takes 24px at edges)
+// Only appear when there's content to scroll to.
+// ============================================================
+
+function _scbStep() { return Cheat_Menu.scroll_button_step || 120; }
+
+function _scbToggle(upBtn, downBtn, target) {
+    var sh = target.scrollHeight;
+    var ch = target.clientHeight;
+    var atTop = target.scrollTop <= 8;
+    var atBottom = (target.scrollTop + ch >= sh - 8);
+    upBtn.style.opacity = atTop ? '0' : '1';
+    upBtn.style.pointerEvents = atTop ? 'none' : '';
+    downBtn.style.opacity = atBottom ? '0' : '1';
+    downBtn.style.pointerEvents = atBottom ? 'none' : '';
+}
+
+function _scbMakeColBtn(dir, target) {
+    var b = document.createElement('button');
+    b.className = 'cheat_scroll_col_btn scb_' + dir;
+    b.setAttribute('aria-label', dir === 'up' ? 'Scroll up' : 'Scroll down');
+    b.innerHTML = dir === 'up' ? '▲' : '▼';
+    function handler(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var step = _scbStep();
+        if (dir === 'up') {
+            target.scrollTop = Math.max(0, target.scrollTop - step);
+        } else {
+            target.scrollTop = Math.min(Math.max(0, target.scrollHeight - target.clientHeight), target.scrollTop + step);
+        }
+    }
+    b.addEventListener('mousedown', handler);
+    b.addEventListener('touchstart', handler, { passive: false });
+    return b;
+}
+
+// Column registry — for resize refresh
+var _scbCols = [];
+
+function _scbRefresh() {
+    for (var i = _scbCols.length - 1; i >= 0; i--) {
+        var c = _scbCols[i];
+        if (c.col !== undefined && (!c.col || !c.col.parentNode)) {
+            _scbCols.splice(i, 1);
+            continue;
+        }
+        _scbToggle(c.up, c.down, c.target);
+    }
+}
+
+var _scbResizeTimer;
+window.addEventListener('resize', function () {
+    clearTimeout(_scbResizeTimer);
+    _scbResizeTimer = setTimeout(_scbRefresh, 100);
+});
+
+// ============================================================
+// Sidebar — column scroll on the right
+// ============================================================
+
+Cheat_Menu.add_sidebar_scroll_buttons = function (container) {
+    if (!container) return;
+    if (container._sbScrollAdded) {
+        if (container.querySelector('.cheat_scroll_column')) return;
+        container._sbScrollAdded = false;
+    }
+    container._sbScrollAdded = true;
+
+    var contentDiv = document.createElement('div');
+    contentDiv.className = 'cheat_sb_content';
+    while (container.firstChild) {
+        contentDiv.appendChild(container.firstChild);
+    }
+
+    var col = document.createElement('div');
+    col.className = 'cheat_scroll_column';
+
+    var upBtn = _scbMakeColBtn('up', contentDiv);
+    var downBtn = _scbMakeColBtn('down', contentDiv);
+    col.appendChild(upBtn);
+    col.appendChild(downBtn);
+
+    container.classList.add('cheat_sb_row');
+    container.appendChild(contentDiv);
+    container.appendChild(col);
+
+    _scbCols.push({ col: col, up: upBtn, down: downBtn, target: contentDiv });
+
+    function toggle() { _scbToggle(upBtn, downBtn, contentDiv); }
+    contentDiv.addEventListener('scroll', toggle, { passive: true });
+    requestAnimationFrame(toggle);
+};
+
+// ============================================================
+// Lists — column scroll on the right
+// ============================================================
+
+Cheat_Menu.add_list_scroll_buttons = function (list) {
+    if (!list) return;
+    if (list._listScbAdded) {
+        if (list.parentNode && list.parentNode.classList.contains('cheat_list_wrapper')) return;
+        list._listScbAdded = false;
+    }
+    list._listScbAdded = true;
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'cheat_list_wrapper';
+
+    var col = document.createElement('div');
+    col.className = 'cheat_scroll_column';
+
+    var upBtn = _scbMakeColBtn('up', list);
+    var downBtn = _scbMakeColBtn('down', list);
+    col.appendChild(upBtn);
+    col.appendChild(downBtn);
+
+    list.parentNode.insertBefore(wrapper, list);
+    wrapper.appendChild(list);
+    wrapper.appendChild(col);
+
+    _scbCols.push({ col: col, up: upBtn, down: downBtn, target: list });
+
+    function toggle() { _scbToggle(upBtn, downBtn, list); }
+    list.addEventListener('scroll', toggle, { passive: true });
+    requestAnimationFrame(toggle);
+};
+
+// ============================================================
+// Content — sticky in-flow buttons
+// ============================================================
+
+Cheat_Menu.add_scroll_buttons = function (container) {
+    if (!container) return;
+    if (container._scbAdded) {
+        if (container.firstChild && container.firstChild.classList.contains('cheat_scroll_btn')) return;
+        container._scbAdded = false;
+    }
+    container._scbAdded = true;
+
+    var upBtn = document.createElement('button');
+    upBtn.className = 'cheat_scroll_btn scb_up';
+    upBtn.setAttribute('aria-label', 'Scroll up');
+    upBtn.innerHTML = '▲';
+
+    var downBtn = document.createElement('button');
+    downBtn.className = 'cheat_scroll_btn scb_down';
+    downBtn.setAttribute('aria-label', 'Scroll down');
+    downBtn.innerHTML = '▼';
+
+    upBtn.addEventListener('mousedown', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        container.scrollTop = Math.max(0, container.scrollTop - _scbStep());
+    });
+    upBtn.addEventListener('touchstart', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        container.scrollTop = Math.max(0, container.scrollTop - _scbStep());
+    }, { passive: false });
+    downBtn.addEventListener('mousedown', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+        container.scrollTop = Math.min(maxScroll, container.scrollTop + _scbStep());
+    });
+    downBtn.addEventListener('touchstart', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+        container.scrollTop = Math.min(maxScroll, container.scrollTop + _scbStep());
+    }, { passive: false });
+
+    container.insertBefore(upBtn, container.firstChild);
+    container.appendChild(downBtn);
+
+    function toggle() { _scbToggle(upBtn, downBtn, container); }
+    container.addEventListener('scroll', toggle, { passive: true });
+    requestAnimationFrame(toggle);
+
+    _scbCols.push({ col: undefined, up: upBtn, down: downBtn, target: container });
+};
+
+// Public refresh — re-evaluate all scroll button visibility
+Cheat_Menu.refresh_scroll_buttons = _scbRefresh;
+
+
 // Source: ui/builders/rows.js
 // ============================================================
 // Cheat Menu - UI Row Builders
 // ============================================================
 
 Cheat_Menu.addEvent = function (el, handler) {
-    el.addEventListener('mousedown', handler);
-    el.addEventListener('touchstart', handler, { passive: false });
+    var sx = 0, sy = 0;
+    el.addEventListener('mousedown', function (e) {
+        sx = e.clientX;
+        sy = e.clientY;
+        e.preventDefault();
+    });
+    el.addEventListener('mouseup', function (e) {
+        var dx = e.clientX - sx;
+        var dy = e.clientY - sy;
+        if (Math.abs(dx) < Cheat_Menu.DRAG_THRESHOLD && Math.abs(dy) < Cheat_Menu.DRAG_THRESHOLD) {
+            handler(e);
+        }
+    });
+    el.addEventListener('touchstart', function (e) {
+        sx = e.changedTouches[0].clientX;
+        sy = e.changedTouches[0].clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', function (e) {
+        var dx = e.changedTouches[0].clientX - sx;
+        var dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) < Cheat_Menu.DRAG_THRESHOLD && Math.abs(dy) < Cheat_Menu.DRAG_THRESHOLD) {
+            e.preventDefault();
+            handler(e);
+        }
+    }, { passive: false });
 };
 
 Cheat_Menu.append_title = function (title) {
@@ -1452,7 +1719,6 @@ Cheat_Menu.append_bottom_bar_controls = function (labelText, onZero, onApply) {
     label.className = "cheat_label";
     label.style.flex = "0 0 auto";
     label.style.fontSize = "0.85em";
-    label.style.marginRight = "4px";
     label.innerHTML = labelText;
 
     var amtSelector = document.createElement('div');
@@ -1651,6 +1917,110 @@ Cheat_Menu.append_actor_selection = function () {
 };
 
 
+// Source: menu/pages/combatVitals.js
+// ============================================================
+// Cheat Menu - Page: Combat & Vitals (Party + Enemy merged)
+// ============================================================
+
+Cheat_Menu.create_page_combat_vitals = function () {
+    Cheat_Menu.append_cheat_title("Combat");
+
+    Cheat_Menu.append_title("Party");
+    var items = [
+        { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(0, true); } },
+        { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(1, true); } },
+        { label: "Full HP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_hp(true); } },
+        { label: "HP 0", btn: "All", fn: function () { Cheat_Menu.set_party_hp(0, false); } },
+        { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_party_hp(1, false); } },
+        { label: "Full HP", btn: "All", fn: function () { Cheat_Menu.recover_party_hp(false); } },
+        { label: "MP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_mp(0, true); } },
+        { label: "MP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_mp(1, true); } },
+        { label: "Full MP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_mp(true); } },
+        { label: "MP 0", btn: "All", fn: function () { Cheat_Menu.set_party_mp(0, false); } },
+        { label: "MP 1", btn: "All", fn: function () { Cheat_Menu.set_party_mp(1, false); } },
+        { label: "Full MP", btn: "All", fn: function () { Cheat_Menu.recover_party_mp(false); } },
+        { label: "TP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_tp(0, true); } },
+        { label: "TP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_tp(1, true); } },
+        { label: "Full TP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_tp(true); } },
+        { label: "TP 0", btn: "All", fn: function () { Cheat_Menu.set_party_tp(0, false); } },
+        { label: "TP 1", btn: "All", fn: function () { Cheat_Menu.set_party_tp(1, false); } },
+        { label: "Full TP", btn: "All", fn: function () { Cheat_Menu.recover_party_tp(false); } }
+    ];
+
+    var grid = document.createElement('div');
+    grid.className = "cheat_action_grid";
+
+    for (var i = 0; i < items.length; i++) {
+        (function (item) {
+            var cell = document.createElement('div');
+            cell.className = "cheat_action_cell";
+
+            var btn = document.createElement('button');
+            btn.className = "cheat_btn";
+            var tagClass = item.btn === 'All' ? 'tag-all' : 'tag-alive';
+            btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
+            btn.style.width = "100%";
+            btn.style.height = "100%";
+            btn.style.padding = "6px 4px";
+            btn.style.lineHeight = "1.3";
+            btn.style.whiteSpace = "normal";
+            btn.style.wordBreak = "break-word";
+            Cheat_Menu.addEvent(btn, function (e) {
+                e.preventDefault();
+                item.fn();
+                SoundManager.playSystemSound(1);
+                Cheat_Menu.update_menu();
+            });
+
+            cell.appendChild(btn);
+            grid.appendChild(cell);
+        })(items[i]);
+    }
+
+    Cheat_Menu.content.appendChild(grid);
+
+    Cheat_Menu.append_title("Enemy");
+    var enemyItems = [
+        { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(0, true); } },
+        { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(1, true); } },
+        { label: "HP 0", btn: "All", fn: function () { Cheat_Menu.set_enemy_hp(0, false); } },
+        { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_enemy_hp(1, false); } }
+    ];
+
+    var enemyGrid = document.createElement('div');
+    enemyGrid.className = "cheat_action_grid";
+
+    for (var j = 0; j < enemyItems.length; j++) {
+        (function (item) {
+            var cell = document.createElement('div');
+            cell.className = "cheat_action_cell";
+
+            var btn = document.createElement('button');
+            btn.className = "cheat_btn";
+            var tagClass = item.btn === 'All' ? 'tag-all' : 'tag-alive';
+            btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
+            btn.style.width = "100%";
+            btn.style.height = "100%";
+            btn.style.padding = "6px 4px";
+            btn.style.lineHeight = "1.3";
+            btn.style.whiteSpace = "normal";
+            btn.style.wordBreak = "break-word";
+            Cheat_Menu.addEvent(btn, function (e) {
+                e.preventDefault();
+                item.fn();
+                SoundManager.playSystemSound(1);
+                Cheat_Menu.update_menu();
+            });
+
+            cell.appendChild(btn);
+            enemyGrid.appendChild(cell);
+        })(enemyItems[j]);
+    }
+
+    Cheat_Menu.content.appendChild(enemyGrid);
+};
+
+
 // Source: menu/pages/godMode.js
 // ============================================================
 // Cheat Menu - Page: God Mode
@@ -1694,117 +2064,174 @@ Cheat_Menu.append_godmode_status = function () {
 };
 
 
-// Source: menu/pages/enemyHp.js
+// Source: menu/pages/progression.js
 // ============================================================
-// Cheat Menu - Page: Enemy HP (grid)
+// Cheat Menu - Page: Progression (EXP + Stats + Gold merged)
 // ============================================================
 
-Cheat_Menu.create_page_enemy_hp = function () {
-    Cheat_Menu.append_cheat_title("Enemy HP");
+Cheat_Menu.create_page_progression = function () {
+    Cheat_Menu.append_cheat_title("Progression");
+    Cheat_Menu.append_actor_selection();
 
-    var items = [
-        { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(0, true); } },
-        { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(1, true); } },
-        { label: "HP 0", btn: "All", fn: function () { Cheat_Menu.set_enemy_hp(0, false); } },
-        { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_enemy_hp(1, false); } }
-    ];
+    // Stats
+    var statSection = document.createElement('div');
+    statSection.className = "cheat_progression_section";
 
-    var grid = document.createElement('div');
-    grid.className = "cheat_action_grid";
+    var statRow = document.createElement('div');
+    statRow.className = "cheat_sub_header";
+    statRow.innerHTML = "Stats";
+    statSection.appendChild(statRow);
 
-    for (var i = 0; i < items.length; i++) {
-        (function (item) {
-            var cell = document.createElement('div');
-            cell.className = "cheat_action_cell";
-
-            var btn = document.createElement('button');
-            btn.className = "cheat_btn";
-            btn.innerHTML = "<b>" + item.label + "</b><br><small>" + item.btn + "</small>";
-            btn.style.width = "100%";
-            btn.style.height = "100%";
-            btn.style.padding = "6px 4px";
-            btn.style.lineHeight = "1.3";
-            btn.style.whiteSpace = "normal";
-            btn.style.wordBreak = "break-word";
-            var ehFn = function (e) {
-                e.preventDefault();
-                item.fn();
-                SoundManager.playSystemSound(1);
-                Cheat_Menu.update_menu();
-            };
-            btn.addEventListener('mousedown', ehFn);
-            btn.addEventListener('touchstart', ehFn, { passive: false });
-
-            cell.appendChild(btn);
-            grid.appendChild(cell);
-        })(items[i]);
+    var stat_string = "";
+    if ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) {
+        if (Cheat_Menu.stat_selection >= $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length) {
+            Cheat_Menu.stat_selection = 0;
+        }
+        stat_string += $dataSystem.terms.params[Cheat_Menu.stat_selection];
     }
+    var row = document.createElement('div');
+    row.className = "cheat_row";
+    var btnL = document.createElement('button');
+    btnL.className = "cheat_btn";
+    btnL.innerHTML = "◄";
+    Cheat_Menu.addEvent(btnL, function (e) {
+        e.preventDefault();
+        Cheat_Menu.scroll_stat("left");
+    });
+    var statLbl = document.createElement('div');
+    statLbl.className = "cheat_value";
+    statLbl.innerHTML = stat_string;
+    statLbl.style.flex = "1";
+    var btnR = document.createElement('button');
+    btnR.className = "cheat_btn";
+    btnR.innerHTML = "►";
+    Cheat_Menu.addEvent(btnR, function (e) {
+        e.preventDefault();
+        Cheat_Menu.scroll_stat("right");
+    });
+    row.appendChild(btnL);
+    row.appendChild(statLbl);
+    row.appendChild(btnR);
+    statSection.appendChild(row);
 
-    Cheat_Menu.content.appendChild(grid);
+    var prevContent = Cheat_Menu.content;
+    Cheat_Menu.content = statSection;
+    var statQty = ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) ?
+        $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus[Cheat_Menu.stat_selection] : 0;
+    Cheat_Menu.append_bottom_bar_controls("Bonus: " + statQty,
+        function () {
+            Cheat_Menu.give_stat($gameActors._data[Cheat_Menu.cheat_selected_actor], Cheat_Menu.stat_selection, -statQty);
+            Cheat_Menu.update_menu();
+            SoundManager.playSystemSound(1);
+        },
+        Cheat_Menu.apply_current_stat
+    );
+    Cheat_Menu.content = prevContent;
+    Cheat_Menu.content.appendChild(statSection);
+
+    // EXP
+    var expSection = document.createElement('div');
+    expSection.className = "cheat_progression_section";
+
+    var expHeader = document.createElement('div');
+    expHeader.className = "cheat_sub_header";
+    expHeader.innerHTML = "EXP";
+    expSection.appendChild(expHeader);
+
+    var prevContent2 = Cheat_Menu.content;
+    Cheat_Menu.content = expSection;
+    var expQty = $gameActors._data[Cheat_Menu.cheat_selected_actor] ? $gameActors._data[Cheat_Menu.cheat_selected_actor].currentExp() : 0;
+    Cheat_Menu.append_bottom_bar_controls("EXP: " + expQty,
+        function () {
+            if ($gameActors._data[Cheat_Menu.cheat_selected_actor]) {
+                Cheat_Menu.give_exp($gameActors._data[Cheat_Menu.cheat_selected_actor], -expQty);
+                Cheat_Menu.update_menu();
+                SoundManager.playSystemSound(1);
+            }
+        },
+        Cheat_Menu.apply_current_exp
+    );
+    Cheat_Menu.content = prevContent2;
+    Cheat_Menu.content.appendChild(expSection);
+
+    // Gold
+    var goldSection = document.createElement('div');
+    goldSection.className = "cheat_progression_section";
+
+    var goldHeader = document.createElement('div');
+    goldHeader.className = "cheat_sub_header";
+    goldHeader.innerHTML = "Gold";
+    goldSection.appendChild(goldHeader);
+
+    var prevContent3 = Cheat_Menu.content;
+    Cheat_Menu.content = goldSection;
+    var goldQty = $gameParty._gold;
+    Cheat_Menu.append_bottom_bar_controls("Gold: " + goldQty,
+        function () {
+            Cheat_Menu.give_gold(-goldQty);
+            Cheat_Menu.update_menu();
+            SoundManager.playSystemSound(1);
+        },
+        Cheat_Menu.apply_current_gold
+    );
+    Cheat_Menu.content = prevContent3;
+    Cheat_Menu.content.appendChild(goldSection);
 };
 
-
-// Source: menu/pages/partyVitals.js
-// ============================================================
-// Cheat Menu - Page: Party Vitals (HP/MP/TP merged, grid)
-// ============================================================
-
-Cheat_Menu.create_page_party_vitals = function () {
-    Cheat_Menu.append_cheat_title("Party Vitals");
-
-    var items = [
-        { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(0, true); } },
-        { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(1, true); } },
-        { label: "Full HP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_hp(true); } },
-        { label: "HP 0", btn: "All", fn: function () { Cheat_Menu.set_party_hp(0, false); } },
-        { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_party_hp(1, false); } },
-        { label: "Full HP", btn: "All", fn: function () { Cheat_Menu.recover_party_hp(false); } },
-        { label: "MP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_mp(0, true); } },
-        { label: "MP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_mp(1, true); } },
-        { label: "Full MP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_mp(true); } },
-        { label: "MP 0", btn: "All", fn: function () { Cheat_Menu.set_party_mp(0, false); } },
-        { label: "MP 1", btn: "All", fn: function () { Cheat_Menu.set_party_mp(1, false); } },
-        { label: "Full MP", btn: "All", fn: function () { Cheat_Menu.recover_party_mp(false); } },
-        { label: "TP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_tp(0, true); } },
-        { label: "TP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_tp(1, true); } },
-        { label: "Full TP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_tp(true); } },
-        { label: "TP 0", btn: "All", fn: function () { Cheat_Menu.set_party_tp(0, false); } },
-        { label: "TP 1", btn: "All", fn: function () { Cheat_Menu.set_party_tp(1, false); } },
-        { label: "Full TP", btn: "All", fn: function () { Cheat_Menu.recover_party_tp(false); } }
-    ];
-
-    var grid = document.createElement('div');
-    grid.className = "cheat_action_grid";
-
-    for (var i = 0; i < items.length; i++) {
-        (function (item) {
-            var cell = document.createElement('div');
-            cell.className = "cheat_action_cell";
-
-            var btn = document.createElement('button');
-            btn.className = "cheat_btn";
-            btn.innerHTML = "<b>" + item.label + "</b><br><small>" + item.btn + "</small>";
-            btn.style.width = "100%";
-            btn.style.height = "100%";
-            btn.style.padding = "6px 4px";
-            btn.style.lineHeight = "1.3";
-            btn.style.whiteSpace = "normal";
-            btn.style.wordBreak = "break-word";
-            var pvFn = function (e) {
-                e.preventDefault();
-                item.fn();
-                SoundManager.playSystemSound(1);
-                Cheat_Menu.update_menu();
-            };
-            btn.addEventListener('mousedown', pvFn);
-            btn.addEventListener('touchstart', pvFn, { passive: false });
-
-            cell.appendChild(btn);
-            grid.appendChild(cell);
-        })(items[i]);
+Cheat_Menu.scroll_stat = function (direction) {
+    if ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) {
+        if (direction == "left") {
+            Cheat_Menu.stat_selection--;
+            if (Cheat_Menu.stat_selection < 0) {
+                Cheat_Menu.stat_selection = $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length - 1;
+            }
+        } else {
+            Cheat_Menu.stat_selection++;
+            if (Cheat_Menu.stat_selection >= $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length) {
+                Cheat_Menu.stat_selection = 0;
+            }
+        }
+    } else {
+        Cheat_Menu.stat_selection = 0;
     }
+    SoundManager.playSystemSound(0);
+    Cheat_Menu.update_menu();
+};
 
-    Cheat_Menu.content.appendChild(grid);
+Cheat_Menu.apply_current_stat = function (direction) {
+    var amount = Cheat_Menu.amounts[Cheat_Menu.amount_index];
+    if (direction == "left") {
+        amount = -amount;
+        SoundManager.playSystemSound(2);
+    } else {
+        SoundManager.playSystemSound(1);
+    }
+    Cheat_Menu.give_stat($gameActors._data[Cheat_Menu.cheat_selected_actor], Cheat_Menu.stat_selection, amount);
+    Cheat_Menu.update_menu();
+};
+
+Cheat_Menu.apply_current_exp = function (direction) {
+    var amount = Cheat_Menu.amounts[Cheat_Menu.amount_index];
+    if (direction == "left") {
+        amount = -amount;
+        SoundManager.playSystemSound(2);
+    } else {
+        SoundManager.playSystemSound(1);
+    }
+    Cheat_Menu.give_exp($gameActors._data[Cheat_Menu.cheat_selected_actor], amount);
+    Cheat_Menu.update_menu();
+};
+
+Cheat_Menu.apply_current_gold = function (direction) {
+    var amount = Cheat_Menu.amounts[Cheat_Menu.amount_index];
+    if (direction == "left") {
+        amount = -amount;
+        SoundManager.playSystemSound(2);
+    } else {
+        SoundManager.playSystemSound(1);
+    }
+    Cheat_Menu.give_gold(amount);
+    Cheat_Menu.update_menu();
 };
 
 
@@ -1815,6 +2242,7 @@ Cheat_Menu.create_page_party_vitals = function () {
 
 Cheat_Menu.create_page_speed = function () {
     Cheat_Menu.append_cheat_title("Movement");
+    Cheat_Menu.initialize_speed_lock();
 
     Cheat_Menu.append_title("Speed");
     var presets = [
@@ -1834,14 +2262,12 @@ Cheat_Menu.create_page_speed = function () {
             btn.style.minWidth = "60px";
             btn.style.flex = "1";
             btn.innerHTML = p.label;
-            var presetFn = function (e) {
+            Cheat_Menu.addEvent(btn, function (e) {
                 e.preventDefault();
                 Cheat_Menu.change_player_speed(p.speed - $gamePlayer._moveSpeed);
                 SoundManager.playSystemSound(1);
                 Cheat_Menu.update_menu();
-            };
-            btn.addEventListener('mousedown', presetFn);
-            btn.addEventListener('touchstart', presetFn, { passive: false });
+            });
             row.appendChild(btn);
         })(presets[i]);
     }
@@ -1885,161 +2311,6 @@ Cheat_Menu.toggle_no_clip_status = function () {
 };
 
 
-// Source: menu/pages/giveExp.js
-// ============================================================
-// Cheat Menu - Page: Give EXP
-// ============================================================
-
-Cheat_Menu.create_page_give_exp = function () {
-    Cheat_Menu.append_cheat_title("Give EXP");
-    Cheat_Menu.append_actor_selection();
-    Cheat_Menu.append_exp_cheat();
-};
-
-Cheat_Menu.append_exp_cheat = function () {
-    var qty = $gameActors._data[Cheat_Menu.cheat_selected_actor] ? $gameActors._data[Cheat_Menu.cheat_selected_actor].currentExp() : 0;
-    Cheat_Menu.append_bottom_bar_controls("EXP: " + qty,
-        function () {
-            if ($gameActors._data[Cheat_Menu.cheat_selected_actor]) {
-                Cheat_Menu.give_exp($gameActors._data[Cheat_Menu.cheat_selected_actor], -qty);
-                Cheat_Menu.update_menu();
-                SoundManager.playSystemSound(1);
-            }
-        },
-        Cheat_Menu.apply_current_exp
-    );
-};
-
-Cheat_Menu.apply_current_exp = function (direction) {
-    var amount = Cheat_Menu.amounts[Cheat_Menu.amount_index];
-    if (direction == "left") {
-        amount = -amount;
-        SoundManager.playSystemSound(2);
-    } else {
-        SoundManager.playSystemSound(1);
-    }
-    Cheat_Menu.give_exp($gameActors._data[Cheat_Menu.cheat_selected_actor], amount);
-    Cheat_Menu.update_menu();
-};
-
-// Source: menu/pages/stats.js
-// ============================================================
-// Cheat Menu - Page: Stats
-// ============================================================
-
-Cheat_Menu.create_page_stats = function () {
-    Cheat_Menu.append_cheat_title("Stats");
-    Cheat_Menu.append_actor_selection();
-    var stat_string = "";
-    if ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) {
-        if (Cheat_Menu.stat_selection >= $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length) {
-            Cheat_Menu.stat_selection = 0;
-        }
-        stat_string += $dataSystem.terms.params[Cheat_Menu.stat_selection];
-    }
-    var row = document.createElement('div');
-    row.className = "cheat_row";
-    var btnL = document.createElement('button');
-    btnL.className = "cheat_btn";
-    btnL.innerHTML = "◄ Stat";
-    var statLFn = function (e) {
-        e.preventDefault();
-        Cheat_Menu.scroll_stat("left");
-    };
-    btnL.addEventListener('mousedown', statLFn);
-    btnL.addEventListener('touchstart', statLFn, { passive: false });
-    var statLbl = document.createElement('div');
-    statLbl.className = "cheat_value";
-    statLbl.innerHTML = stat_string;
-    statLbl.style.flex = "1";
-    var btnR = document.createElement('button');
-    btnR.className = "cheat_btn";
-    btnR.innerHTML = "Stat ►";
-    var statRFn = function (e) {
-        e.preventDefault();
-        Cheat_Menu.scroll_stat("right");
-    };
-    btnR.addEventListener('mousedown', statRFn);
-    btnR.addEventListener('touchstart', statRFn, { passive: false });
-    row.appendChild(btnL);
-    row.appendChild(statLbl);
-    row.appendChild(btnR);
-    Cheat_Menu.content.appendChild(row);
-
-    var qty = ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) ?
-        $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus[Cheat_Menu.stat_selection] : 0;
-    Cheat_Menu.append_bottom_bar_controls("Bonus: " + qty,
-        function () {
-            Cheat_Menu.give_stat($gameActors._data[Cheat_Menu.cheat_selected_actor], Cheat_Menu.stat_selection, -qty);
-            Cheat_Menu.update_menu();
-            SoundManager.playSystemSound(1);
-        },
-        Cheat_Menu.apply_current_stat
-    );
-};
-
-Cheat_Menu.scroll_stat = function (direction) {
-    if ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) {
-        if (direction == "left") {
-            Cheat_Menu.stat_selection--;
-            if (Cheat_Menu.stat_selection < 0) {
-                Cheat_Menu.stat_selection = $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length - 1;
-            }
-        } else {
-            Cheat_Menu.stat_selection++;
-            if (Cheat_Menu.stat_selection >= $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length) {
-                Cheat_Menu.stat_selection = 0;
-            }
-        }
-    } else {
-        Cheat_Menu.stat_selection = 0;
-    }
-    SoundManager.playSystemSound(0);
-    Cheat_Menu.update_menu();
-};
-
-Cheat_Menu.apply_current_stat = function (direction) {
-    var amount = Cheat_Menu.amounts[Cheat_Menu.amount_index];
-    if (direction == "left") {
-        amount = -amount;
-        SoundManager.playSystemSound(2);
-    } else {
-        SoundManager.playSystemSound(1);
-    }
-    Cheat_Menu.give_stat($gameActors._data[Cheat_Menu.cheat_selected_actor], Cheat_Menu.stat_selection, amount);
-    Cheat_Menu.update_menu();
-};
-
-// Source: menu/pages/gold.js
-// ============================================================
-// Cheat Menu - Page: Gold
-// ============================================================
-
-Cheat_Menu.create_page_gold = function () {
-    Cheat_Menu.append_cheat_title("Gold");
-    var qty = $gameParty._gold;
-    Cheat_Menu.append_bottom_bar_controls("Gold: " + qty,
-        function () {
-            Cheat_Menu.give_gold(-qty);
-            Cheat_Menu.update_menu();
-            SoundManager.playSystemSound(1);
-        },
-        Cheat_Menu.apply_current_gold
-    );
-};
-
-Cheat_Menu.apply_current_gold = function (direction) {
-    var amount = Cheat_Menu.amounts[Cheat_Menu.amount_index];
-    if (direction == "left") {
-        amount = -amount;
-        SoundManager.playSystemSound(2);
-    } else {
-        SoundManager.playSystemSound(1);
-    }
-    Cheat_Menu.give_gold(amount);
-    Cheat_Menu.update_menu();
-};
-
 // Source: menu/pages/items.js
 // ============================================================
 // Cheat Menu - Page: Items
@@ -2052,6 +2323,8 @@ Cheat_Menu.create_page_items = function () {
         Cheat_Menu.item_selection,
         function (idx) {
             Cheat_Menu.item_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2094,6 +2367,8 @@ Cheat_Menu.create_page_weapons = function () {
         Cheat_Menu.weapon_selection,
         function (idx) {
             Cheat_Menu.weapon_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2136,6 +2411,8 @@ Cheat_Menu.create_page_armors = function () {
         Cheat_Menu.armor_selection,
         function (idx) {
             Cheat_Menu.armor_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2178,6 +2455,8 @@ Cheat_Menu.create_page_variables = function () {
         Cheat_Menu.variable_selection,
         function (idx) {
             Cheat_Menu.variable_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
 
@@ -2252,13 +2531,19 @@ Cheat_Menu.create_page_switches = function () {
         Cheat_Menu.switch_selection,
         function (idx) {
             Cheat_Menu.switch_selection = idx;
-            Cheat_Menu.toggle_switch(idx);
-            if ($gameSwitches.value(idx)) {
-                SoundManager.playSystemSound(1);
-            } else {
-                SoundManager.playSystemSound(2);
-            }
-            Cheat_Menu.update_menu();
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
+            var name = $dataSystem.switches[idx] || "Switch " + idx;
+            var currentVal = $gameSwitches.value(idx);
+            Cheat_Menu.open_confirm_modal("Toggle <b>" + name + "</b>?<br>Currently: <b>" + (currentVal ? "ON" : "OFF") + "</b>", function () {
+                Cheat_Menu.toggle_switch(idx);
+                if ($gameSwitches.value(idx)) {
+                    SoundManager.playSystemSound(1);
+                } else {
+                    SoundManager.playSystemSound(2);
+                }
+                Cheat_Menu.update_menu();
+            });
         },
         function (item, idx) { return item || "Switch " + idx; },
         true,
@@ -2313,9 +2598,7 @@ Cheat_Menu.create_page_save_recall = function () {
         btnSave.className = "cheat_btn";
         btnSave.innerHTML = "Save";
         btnSave.style.minWidth = "50px";
-        var saveFn = Cheat_Menu.save_position.bind(null, i);
-        btnSave.addEventListener('mousedown', saveFn);
-        btnSave.addEventListener('touchstart', saveFn, { passive: false });
+        Cheat_Menu.addEvent(btnSave, Cheat_Menu.save_position.bind(null, i));
 
         var btnRecall = document.createElement('button');
         btnRecall.className = "cheat_btn";
@@ -2326,7 +2609,7 @@ Cheat_Menu.create_page_save_recall = function () {
         } else {
             btnRecall.style.opacity = "0.4";
         }
-        var recallFn = function (slotIdx) {
+        Cheat_Menu.addEvent(btnRecall, (function (slotIdx) {
             return function (e) {
                 e.preventDefault();
                 var p = Cheat_Menu.saved_positions[slotIdx];
@@ -2344,9 +2627,7 @@ Cheat_Menu.create_page_save_recall = function () {
                     }
                 );
             };
-        }(i);
-        btnRecall.addEventListener('mousedown', recallFn);
-        btnRecall.addEventListener('touchstart', recallFn, { passive: false });
+        })(i));
 
         controls.appendChild(btnSave);
         controls.appendChild(btnRecall);
@@ -2378,6 +2659,8 @@ Cheat_Menu.create_page_teleport = function () {
         Cheat_Menu.teleport_location.m,
         function (idx) {
             Cheat_Menu.teleport_location.m = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },
@@ -2401,24 +2684,22 @@ Cheat_Menu.create_page_teleport = function () {
 
     Cheat_Menu.append_scroll_selector("X: " + Cheat_Menu.teleport_location.x, null, null, Cheat_Menu.scroll_x_teleport_selection);
     Cheat_Menu.append_scroll_selector("Y: " + Cheat_Menu.teleport_location.y, null, null, Cheat_Menu.scroll_y_teleport_selection);
+    function tpAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); }
+    function tpClipAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); $gamePlayer._through = true; SoundManager.playSystemSound(1); }
     var tRow = document.createElement('div');
     tRow.className = "cheat_row";
     tRow.style.gap = "6px";
-    function tpAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); }
-    function tpClipAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); $gamePlayer._through = true; SoundManager.playSystemSound(1); }
     var tBtn = document.createElement('button');
     tBtn.className = "cheat_btn";
     tBtn.style.flex = "1";
     tBtn.innerHTML = "Activate";
-    tBtn.addEventListener('mousedown', tpAction);
-    tBtn.addEventListener('touchstart', tpAction, { passive: false });
+    Cheat_Menu.addEvent(tBtn, tpAction);
     tRow.appendChild(tBtn);
     var tnBtn = document.createElement('button');
     tnBtn.className = "cheat_btn";
     tnBtn.style.flex = "1";
     tnBtn.innerHTML = "TP+Clip";
-    tnBtn.addEventListener('mousedown', tpClipAction);
-    tnBtn.addEventListener('touchstart', tpClipAction, { passive: false });
+    Cheat_Menu.addEvent(tnBtn, tpClipAction);
     tRow.appendChild(tnBtn);
     Cheat_Menu.content.appendChild(tRow);
 };
@@ -2498,11 +2779,6 @@ Cheat_Menu.create_page_clear_states = function () {
 Cheat_Menu.create_page_general = function () {
     Cheat_Menu.append_cheat_title("Interface");
 
-    Cheat_Menu.append_setting_row("Menu Scale Size", Cheat_Menu.menu_scale + "%",
-        function () { Cheat_Menu.menu_scale = Math.max(30, Cheat_Menu.menu_scale - 5); Cheat_Menu.update_menu(); },
-        function () { Cheat_Menu.menu_scale = Math.min(100, Cheat_Menu.menu_scale + 5); Cheat_Menu.update_menu(); }
-    );
-
     Cheat_Menu.append_scroll_selector("Menu Position: " + Cheat_Menu.positions[Cheat_Menu.position], null, null, function (dir) {
         if (dir === "left") {
             Cheat_Menu.position--;
@@ -2520,6 +2796,15 @@ Cheat_Menu.create_page_general = function () {
         else Cheat_Menu.fontSize = Math.min(24, Cheat_Menu.fontSize + 1);
         Cheat_Menu.overlay_box.style.fontSize = Cheat_Menu.fontSize + "px";
         SoundManager.playSystemSound(0);
+        Cheat_Menu.update_menu();
+    });
+
+    Cheat_Menu.append_scroll_selector("Menu Scale Size: " + Cheat_Menu.menu_scale + "%", null, null, function (dir) {
+        if (dir === "left") Cheat_Menu.menu_scale = Math.max(40, Cheat_Menu.menu_scale - 5);
+        else Cheat_Menu.menu_scale = Math.min(100, Cheat_Menu.menu_scale + 5);
+        Cheat_Menu.manual_menu_size = null;
+        SoundManager.playSystemSound(0);
+        Cheat_Menu.save_values();
         Cheat_Menu.update_menu();
     });
 
@@ -2543,9 +2828,6 @@ Cheat_Menu.create_page_general = function () {
         );
     }
 
-    Cheat_Menu.append_cheat("Close Menu", "Close", null, function () {
-        Cheat_Menu.close_menu();
-    });
 };
 
 // Source: menu/registry.js
@@ -2558,15 +2840,13 @@ Cheat_Menu.register_pages = function () {
     Cheat_Menu._pages_registered = true;
 
     // Register all menu pages (order determines sidebar position before grouping)
-    // Insert at front so menu order is as defined here
+    // NOTE: build.js determines which page files are included — only add functions
+    // whose source file is in the build's module list.
     Cheat_Menu.menus = [
+        Cheat_Menu.create_page_combat_vitals,
         Cheat_Menu.create_page_god_mode,
         Cheat_Menu.create_page_speed,
-        Cheat_Menu.create_page_enemy_hp,
-        Cheat_Menu.create_page_party_vitals,
-        Cheat_Menu.create_page_give_exp,
-        Cheat_Menu.create_page_stats,
-        Cheat_Menu.create_page_gold,
+        Cheat_Menu.create_page_progression,
         Cheat_Menu.create_page_items,
         Cheat_Menu.create_page_weapons,
         Cheat_Menu.create_page_armors,
@@ -2577,9 +2857,25 @@ Cheat_Menu.register_pages = function () {
         Cheat_Menu.create_page_clear_states,
         Cheat_Menu.create_page_general
     ];
+    Cheat_Menu._page_titles = [
+        "Combat",
+        "God Mode",
+        "Movement",
+        "Progression",
+        "Items",
+        "Weapons",
+        "Armors",
+        "Variables",
+        "Switches",
+        "Save and Recall",
+        "Teleport",
+        "Clear States",
+        "Interface"
+    ];
 };
 
 Cheat_Menu.inject_ui_settings = function () {
+    Cheat_Menu._page_titles.push("Quick Actions HUD");
     Cheat_Menu.menus.push(function () {
         Cheat_Menu.append_cheat_title("Quick Actions HUD");
         Cheat_Menu.append_setting_row("Enable", Cheat_Menu.hud_config.enabled ? "ON" : "OFF", null,
@@ -2598,6 +2894,37 @@ Cheat_Menu.inject_ui_settings = function () {
             Cheat_Menu.append_setting_row("Layout", layoutLabel,
                 function () { Cheat_Menu.hud_config.layout = 'vertical'; Cheat_Menu.update_menu(); },
                 function () { Cheat_Menu.hud_config.layout = 'horizontal'; Cheat_Menu.update_menu(); }
+            );
+            var posList = ['Top', 'Bottom', 'Left', 'Right'];
+            var posIdx = posList.indexOf(Cheat_Menu.hud_config.position);
+            if (posIdx === -1) posIdx = 0;
+            Cheat_Menu.append_setting_row("Position", Cheat_Menu.hud_config.position,
+                function () {
+                    var idx = posList.indexOf(Cheat_Menu.hud_config.position) - 1;
+                    if (idx < 0) idx = posList.length - 1;
+                    Cheat_Menu.hud_config.position = posList[idx];
+                    Cheat_Menu.hud_config.freePos = null;
+                    if (posList[idx] === 'Left' || posList[idx] === 'Right') {
+                        Cheat_Menu.hud_config.layout = 'vertical';
+                    } else {
+                        Cheat_Menu.hud_config.layout = 'horizontal';
+                    }
+                    Cheat_Menu.update_menu();
+                    Cheat_Menu.save_values();
+                },
+                function () {
+                    var idx = posList.indexOf(Cheat_Menu.hud_config.position) + 1;
+                    if (idx >= posList.length) idx = 0;
+                    Cheat_Menu.hud_config.position = posList[idx];
+                    Cheat_Menu.hud_config.freePos = null;
+                    if (posList[idx] === 'Left' || posList[idx] === 'Right') {
+                        Cheat_Menu.hud_config.layout = 'vertical';
+                    } else {
+                        Cheat_Menu.hud_config.layout = 'horizontal';
+                    }
+                    Cheat_Menu.update_menu();
+                    Cheat_Menu.save_values();
+                }
             );
             if (Cheat_Menu.hud_config.freePos) {
                 Cheat_Menu.append_cheat("Reset Position", "Reset", null, function () {
@@ -2655,7 +2982,8 @@ Cheat_Menu.group_menus_by_umbrella = function () {
         var len = rawNames.length;
         try { Cheat_Menu.menus[i](); } catch (e) { /* silent — skip broken page */ }
         if (rawNames.length === len) {
-            rawNames.push("Menu " + (i + 1));
+            var fallback = (Cheat_Menu._page_titles && Cheat_Menu._page_titles[i]) || ("Menu " + (i + 1));
+            rawNames.push(fallback);
         }
     }
 
@@ -2667,8 +2995,8 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
     var groups = {
         "Inventory": { keys: ["items", "weapon", "armor"], items: [] },
-        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states"], items: [] },
-        "Progression": { keys: ["exp", "stat", "gold"], items: [] },
+        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states", "combat"], items: [] },
+        "Progression": { keys: ["exp", "stat", "gold", "progression"], items: [] },
         "Variables & Switches": { keys: ["variable", "switch"], items: [] },
         "Movement": { keys: ["movement", "no clip", "speed", "noclip"], items: [] },
         "Navigation": { keys: ["save and recall", "teleport", "recall"], items: [] },
@@ -2737,10 +3065,13 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
             Cheat_Menu.content.appendChild(nav);
 
-            var old_append = Cheat_Menu.append_cheat_title;
-            Cheat_Menu.append_cheat_title = function () { };
-            items[subIdx].fn();
-            Cheat_Menu.append_cheat_title = old_append;
+            var entry = items[subIdx];
+            if (typeof entry.fn === 'function') {
+                var old_append = Cheat_Menu.append_cheat_title;
+                Cheat_Menu.append_cheat_title = function () { };
+                entry.fn();
+                Cheat_Menu.append_cheat_title = old_append;
+            }
         });
 
         newNames.push(title);
@@ -2825,20 +3156,21 @@ Cheat_Menu.update_menu = function () {
     Cheat_Menu.render_hover_button();
     Cheat_Menu.render_quick_hud();
 
-    // Attach drag-scroll and scroll arrows for touch/mouse
+    // Attach scroll buttons for touch/mouse
     requestAnimationFrame(function () {
-        Cheat_Menu.initDragScroll(Cheat_Menu.sidebar);
-        Cheat_Menu.initDragScroll(Cheat_Menu.content);
-        Cheat_Menu.attach_scroll_arrows(Cheat_Menu.overlay_box, Cheat_Menu.content, 120);
+        Cheat_Menu.add_sidebar_scroll_buttons(Cheat_Menu.sidebar);
+        Cheat_Menu.add_scroll_buttons(Cheat_Menu.content);
 
         var searchContainers = document.querySelectorAll('.cheat_search_container');
         for (var i = 0; i < searchContainers.length; i++) {
             var list = searchContainers[i].querySelector('.cheat_list');
             if (list) {
-                Cheat_Menu.initDragScroll(list);
-                Cheat_Menu.attach_scroll_arrows(searchContainers[i], list, 90);
+                Cheat_Menu.add_list_scroll_buttons(list);
+                list.scrollTop = Cheat_Menu.list_state.scroll;
             }
         }
+
+        Cheat_Menu.refresh_scroll_buttons();
     });
 };
 
@@ -2916,169 +3248,6 @@ window.addEventListener("keydown", function (event) {
     }
 });
 
-// Source: input/dragScroll.js
-// ============================================================
-// Cheat Menu - Drag-to-Scroll (JoiPlay / Touch Compatible)
-// ============================================================
-
-Cheat_Menu.initDragScroll = function (el) {
-    if (!el || el._dragScrollBound) return;
-    el._dragScrollBound = true;
-
-    el.style.webkitOverflowScrolling = 'touch';
-
-    var startY = 0;
-    var startX = 0;
-    var scrollTopStart = 0;
-    var scrollLeftStart = 0;
-    var isDragging = false;
-    var hasMoved = false;
-
-    function getClientY(e) {
-        return e.touches ? e.touches[0].clientY : e.clientY;
-    }
-
-    function getClientX(e) {
-        return e.touches ? e.touches[0].clientX : e.clientX;
-    }
-
-    function onStart(e) {
-        isDragging = true;
-        hasMoved = false;
-        startY = getClientY(e);
-        startX = getClientX(e);
-        scrollTopStart = el.scrollTop;
-        scrollLeftStart = el.scrollLeft;
-        el.style.cursor = 'grabbing';
-        el.style.userSelect = 'none';
-    }
-
-    function onMove(e) {
-        if (!isDragging) return;
-        var dy = getClientY(e) - startY;
-        var dx = getClientX(e) - startX;
-        if (!hasMoved && Math.abs(dy) < Cheat_Menu.DRAG_THRESHOLD && Math.abs(dx) < Cheat_Menu.DRAG_THRESHOLD) return;
-        hasMoved = true;
-        el.scrollTop = scrollTopStart - dy;
-        el.scrollLeft = scrollLeftStart - dx;
-        e.stopPropagation();
-    }
-
-    function onEnd() {
-        isDragging = false;
-        hasMoved = false;
-        el.style.cursor = '';
-        el.style.userSelect = '';
-    }
-
-    el.addEventListener('mousedown', onStart, { passive: false });
-    el.addEventListener('touchstart', onStart, { passive: true });
-    window.addEventListener('mousemove', onMove, { passive: false });
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('mouseup', onEnd);
-    window.addEventListener('mouseleave', onEnd);
-    window.addEventListener('touchend', onEnd);
-};
-
-// Scroll arrows (for containers with overflow)
-Cheat_Menu.update_scroll_arrow_visibility = function (host, scroller) {
-    if (!host || !scroller) return;
-
-    var upBtn = host.querySelector(':scope > .cheat_scroll_arrow.up');
-    var downBtn = host.querySelector(':scope > .cheat_scroll_arrow.down');
-    if (!upBtn || !downBtn) return;
-
-    var maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    var hasOverflow = maxScroll > 4;
-
-    if (!hasOverflow) {
-        upBtn.style.display = 'none';
-        downBtn.style.display = 'none';
-        return;
-    }
-
-    upBtn.style.display = (scroller.scrollTop > 4) ? 'flex' : 'none';
-    downBtn.style.display = (scroller.scrollTop < maxScroll - 4) ? 'flex' : 'none';
-};
-
-Cheat_Menu.attach_scroll_arrows = function (host, scroller, step) {
-    if (!host || !scroller) return;
-
-    var oldBtns = host.querySelectorAll(':scope > .cheat_scroll_arrow');
-    for (var i = 0; i < oldBtns.length; i++) {
-        oldBtns[i].remove();
-    }
-
-    var upBtn = document.createElement('button');
-    upBtn.className = 'cheat_scroll_arrow up';
-    upBtn.type = 'button';
-    upBtn.innerHTML = '↑';
-
-    var downBtn = document.createElement('button');
-    downBtn.className = 'cheat_scroll_arrow down';
-    downBtn.type = 'button';
-    downBtn.innerHTML = '↓';
-
-    var bindScroll = function (btn, amount) {
-        var holdTimer = null;
-
-        var stepOnce = function (e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            scroller.scrollTop += amount;
-            Cheat_Menu.update_scroll_arrow_visibility(host, scroller);
-        };
-
-        var start = function (e) {
-            stepOnce(e);
-            if (holdTimer) clearInterval(holdTimer);
-            holdTimer = setInterval(function () {
-                scroller.scrollTop += amount;
-                Cheat_Menu.update_scroll_arrow_visibility(host, scroller);
-            }, 120);
-        };
-
-        var stop = function () {
-            if (holdTimer) {
-                clearInterval(holdTimer);
-                holdTimer = null;
-            }
-        };
-
-        btn.addEventListener('mousedown', start, false);
-        btn.addEventListener('touchstart', start, { passive: false });
-        btn.addEventListener('mouseup', stop, false);
-        btn.addEventListener('mouseleave', stop, false);
-        btn.addEventListener('touchend', stop, false);
-        btn.addEventListener('touchcancel', stop, false);
-    };
-
-    bindScroll(upBtn, -step);
-    bindScroll(downBtn, step);
-
-    host.appendChild(upBtn);
-    host.appendChild(downBtn);
-
-    if (!scroller._cheatScrollArrowBound) {
-        scroller._cheatScrollArrowBound = true;
-
-        scroller.addEventListener('scroll', function () {
-            Cheat_Menu.update_scroll_arrow_visibility(host, scroller);
-        }, { passive: true });
-
-        window.addEventListener('resize', function () {
-            Cheat_Menu.update_scroll_arrow_visibility(host, scroller);
-        });
-    }
-
-    requestAnimationFrame(function () {
-        Cheat_Menu.update_scroll_arrow_visibility(host, scroller);
-    });
-};
-
-
 // Source: core/init.js
 // ============================================================
 // Cheat Menu - Initialization & Game Hooks
@@ -3124,6 +3293,7 @@ DataManager.loadGame = function (savefileId) {
     Cheat_Menu.initialize();
     var result = DataManager.default_loadGame(savefileId);
     Cheat_Menu.load_saved_values();
+    Cheat_Menu.initialize_speed_lock();
     return result;
 };
 
@@ -3146,6 +3316,7 @@ window.addEventListener("resize", function () {
     if (Cheat_Menu.overlay_box && Cheat_Menu.cheat_menu_open) {
         Cheat_Menu.position_menu();
         Cheat_Menu.update_menu_size();
+        Cheat_Menu.refresh_scroll_buttons();
     }
 });
 

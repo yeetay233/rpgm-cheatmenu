@@ -9,6 +9,8 @@ Cheat_Menu.create_page_weapons = function () {
         Cheat_Menu.weapon_selection,
         function (idx) {
             Cheat_Menu.weapon_selection = idx;
+            var listEl = document.querySelector('.cheat_list');
+            if (listEl) Cheat_Menu.list_state.scroll = listEl.scrollTop;
             SoundManager.playSystemSound(0);
             Cheat_Menu.update_menu();
         },

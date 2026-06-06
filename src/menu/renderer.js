@@ -53,19 +53,20 @@ Cheat_Menu.update_menu = function () {
     Cheat_Menu.render_hover_button();
     Cheat_Menu.render_quick_hud();
 
-    // Attach drag-scroll and scroll arrows for touch/mouse
+    // Attach scroll buttons for touch/mouse
     requestAnimationFrame(function () {
-        Cheat_Menu.initDragScroll(Cheat_Menu.sidebar);
-        Cheat_Menu.initDragScroll(Cheat_Menu.content);
-        Cheat_Menu.attach_scroll_arrows(Cheat_Menu.overlay_box, Cheat_Menu.content, 120);
+        Cheat_Menu.add_sidebar_scroll_buttons(Cheat_Menu.sidebar);
+        Cheat_Menu.add_scroll_buttons(Cheat_Menu.content);
 
         var searchContainers = document.querySelectorAll('.cheat_search_container');
         for (var i = 0; i < searchContainers.length; i++) {
             var list = searchContainers[i].querySelector('.cheat_list');
             if (list) {
-                Cheat_Menu.initDragScroll(list);
-                Cheat_Menu.attach_scroll_arrows(searchContainers[i], list, 90);
+                Cheat_Menu.add_list_scroll_buttons(list);
+                list.scrollTop = Cheat_Menu.list_state.scroll;
             }
         }
+
+        Cheat_Menu.refresh_scroll_buttons();
     });
 };

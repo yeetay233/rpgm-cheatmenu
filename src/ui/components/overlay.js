@@ -136,6 +136,7 @@ Cheat_Menu._initResizeHandle = function () {
         if (typeof $gameSystem !== 'undefined' && $gameSystem) {
             Cheat_Menu.save_values();
         }
+        Cheat_Menu.refresh_scroll_buttons();
     }
 
     handle.addEventListener('mousedown', onStart);
