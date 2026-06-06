@@ -1,0 +1,699 @@
+/* =========================================================
+   CHEAT MENU LAYOUT
+========================================================= */
+
+#cheat_menu {
+    position: absolute;
+    width: 70vw;
+    height: 70vh;
+    max-width: 1200px;
+    max-height: 800px;
+    z-index: 1000;
+    display: flex;
+    overflow: hidden;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 1px solid #444;
+    border-radius: 8px;
+}
+
+#cheat_menu * {
+    box-sizing: border-box;
+}
+
+#cheat_menu_sidebar {
+    position: relative;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    touch-action: pan-y;
+    background-color: rgba(10, 10, 10, 0.95);
+    border-right: 1px solid #444;
+}
+
+#cheat_menu_content {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    touch-action: pan-y;
+    padding: 15px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar_btn {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #333;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 1em;
+    padding: 10px;
+    text-align: left;
+}
+
+.sidebar_btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.sidebar_btn.active {
+    background-color: rgba(0, 136, 255, 0.3);
+    border-left: 3px solid #00aaff;
+    color: #00aaff;
+}
+
+
+/* =========================================================
+   TITLES / ROWS / COMMON CONTROLS
+========================================================= */
+
+.cheat_menu_title {
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #555;
+    color: #00aaff;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.cheat_row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+.cheat_label {
+    flex: 1;
+    font-size: 1em;
+}
+
+.cheat_controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cheat_btn {
+    padding: 5px 10px;
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.cheat_btn:hover {
+    background-color: #555;
+    border-color: #777;
+}
+
+.cheat_btn:active {
+    background-color: #00aaff;
+    border-color: #00aaff;
+}
+
+.cheat_value {
+    min-width: 40px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #00aaff;
+    font-size: 1em;
+    text-align: center;
+}
+
+
+/* =========================================================
+   SEARCH / LISTS
+========================================================= */
+
+.cheat_search_container {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    min-height: 120px;
+    margin-bottom: 15px;
+}
+
+.cheat_search_input {
+    width: 100%;
+    padding: 8px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1em;
+}
+
+.cheat_list {
+    flex: 1;
+    overflow-y: auto;
+    touch-action: pan-y;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.cheat_list_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.cheat_list_item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cheat_list_item.selected {
+    background: rgba(0, 136, 255, 0.3);
+    color: #00aaff;
+}
+
+.cheat_list_item_val {
+    margin-top: 0;
+    color: #888;
+    font-size: 0.85em;
+}
+
+
+/* =========================================================
+   GRID LISTS
+========================================================= */
+
+.cheat_list.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    align-content: start;
+    gap: 6px;
+    padding: 6px;
+}
+
+.cheat_list.grid .cheat_list_item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.cheat_list.grid .cheat_list_item_val {
+    margin: 0;
+    color: #00aaff;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-align: right;
+}
+
+
+/* =========================================================
+   SUB TABS / UMBRELLA GROUPS
+========================================================= */
+
+.cheat_sub_nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 15px;
+    padding-bottom: 0;
+    border-bottom: 2px solid #444;
+}
+
+.cheat_sub_tab {
+    padding: 8px 15px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.cheat_sub_tab:hover {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.cheat_sub_tab.active {
+    margin-bottom: -2px;
+    background: rgba(0, 136, 255, 0.2);
+    border-color: #00aaff;
+    border-bottom: 2px solid rgba(0, 136, 255, 0.2);
+    color: #00aaff;
+}
+
+.cheat_sub_header {
+    margin: 10px 5px 5px 5px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #44aadd;
+    color: #44aadd;
+    font-size: 1.1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   SETTINGS-SPECIFIC ROWS
+========================================================= */
+
+.cheat_setting_row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #333;
+    border-radius: 6px;
+}
+
+.cheat_setting_row .cheat_label {
+    margin: 0;
+    color: #ccc;
+    font-size: 1.05em;
+    font-weight: bold;
+}
+
+.cheat_setting_row .cheat_controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cheat_settings_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   BOTTOM BAR / AMOUNT CONTROLS
+========================================================= */
+
+.cheat_bottom_bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+}
+
+.cheat_bottom_bar .cheat_controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cheat_amount_group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+.cheat_modal_bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.cheat_modal {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 250px;
+    padding: 20px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 8px;
+}
+
+.cheat_modal_title {
+    color: #00aaff;
+    font-weight: bold;
+    text-align: center;
+}
+
+.cheat_modal_buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   QUICK HUD / HOVER BUTTON
+========================================================= */
+
+#cheat_hover_btn {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid #555;
+    border-radius: 50%;
+    color: #ffffff;
+    cursor: pointer;
+    line-height: 1;
+    text-align: center;
+    user-select: none;
+}
+
+#cheat_quick_hud {
+    position: fixed;
+    left: 0;
+    z-index: 998;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    width: 100vw;
+    padding: 5px;
+    background: transparent;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+#cheat_quick_hud.top {
+    top: 0;
+}
+
+#cheat_quick_hud.bottom {
+    bottom: 0;
+}
+
+.cheat_hud_btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    pointer-events: auto;
+    backdrop-filter: blur(4px);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.cheat_hud_btn:hover {
+    background: rgba(0, 136, 255, 0.4) !important;
+    border-color: #00aaff;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+#cheat_menu_close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    z-index: 1001;
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    user-select: none;
+}
+
+#cheat_menu_close:hover {
+    color: #ff4444;
+}
+
+
+/* =========================================================
+   SCROLL ARROWS
+========================================================= */
+
+.cheat_scroll_arrow {
+    position: absolute;
+    right: 4px;
+    width: 28px;
+    height: 28px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    background: rgba(20, 20, 20, 0.94);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 80;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.cheat_scroll_arrow.up {
+    top: 8px;
+}
+
+.cheat_scroll_arrow.down {
+    bottom: 8px;
+}
+
+.cheat_scroll_arrow:hover,
+.cheat_scroll_arrow:active {
+    background: rgba(0, 136, 255, 0.32);
+    border-color: #00aaff;
+    color: #ffffff;
+}
+
+#cheat_menu_sidebar,
+#cheat_menu_content,
+.cheat_search_container {
+    position: relative;
+}
+
+#cheat_menu_content {
+    padding-right: 42px;
+}
+
+.cheat_search_container {
+    padding-right: 42px;
+}
+
+
+/* =========================================================
+   SCROLLBARS
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #111;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* SIMPLE SCROLL BUTTONS */
+#cheatmenusidebar, #cheatmenucontent, .cheatsearchcontainer {
+  position: relative;
+}
+
+.cheatscrollwrap {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+}
+
+.cheatmenusidebarwrap {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 34px;
+}
+
+.cheatmenucontentwrap {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 34px;
+}
+
+.cheatsearchcontainer .cheatlist {
+  padding-right: 0;
+}
+
+.cheatscrollbtn {
+  position: absolute;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.94);
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 90;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+
+.cheatscrollbtn.up { top: 6px; }
+.cheatscrollbtn.down { bottom: 6px; }
+
+.cheatscrollbtn:hover,
+.cheatscrollbtn:active {
+  background: rgba(0, 136, 255, 0.32);
+  border-color: #00aaff;
+}
+
+.cheatscrollbtn.disabled {
+  opacity: 0.35;
+}
+
+.cheatscrollwrap.show-top-fade::before,
+.cheatscrollwrap.show-bottom-fade::after,
+.cheatsearchcontainer.show-top-fade::before,
+.cheatsearchcontainer.show-bottom-fade::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 30px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.cheatscrollwrap.show-top-fade::before,
+.cheatsearchcontainer.show-top-fade::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(20,20,20,0.92), rgba(20,20,20,0));
+}
+
+.cheatscrollwrap.show-bottom-fade::after,
+.cheatsearchcontainer.show-bottom-fade::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(20,20,20,0.92), rgba(20,20,20,0));
+}
+
+#cheat_menu {
+    position: absolute;
+}
+
+#cheat_menu_content {
+    padding-right: 48px;
+}
+
+.cheat_fixed_content_scroll {
+    position: absolute;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    background: rgba(20, 20, 20, 0.94);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 120;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.cheat_fixed_content_scroll.up {
+    top: 48px;
+    margin-right: 5px;
+}
+
+.cheat_fixed_content_scroll.down {
+    bottom: 8px;
+    margin-right: 5px;
+}
+
+.cheat_fixed_content_scroll:hover,
+.cheat_fixed_content_scroll:active {
+    background: rgba(0, 136, 255, 0.32);
+    border-color: #00aaff;
+    color: #ffffff;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "cheat-menu",
+  "version": "8.0.0",
+  "description": "Cheat Menu Plugin for RPG Maker MV/MZ",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "private": true
+}
