@@ -8,7 +8,7 @@ Cheat_Menu.render_hover_button = function () {
         Cheat_Menu.hover_btn.id = "cheat_hover_btn";
         Cheat_Menu.hover_btn.innerHTML = "★";
 
-        Cheat_Menu.hover_btn.addEventListener('mousedown', function (e) {
+        var hoverFn = function (e) {
             e.stopPropagation();
             e.preventDefault();
             if (Cheat_Menu.cheat_menu_open) {
@@ -17,7 +17,9 @@ Cheat_Menu.render_hover_button = function () {
                 Cheat_Menu.open_menu();
                 Cheat_Menu.render_quick_hud();
             }
-        });
+        };
+        Cheat_Menu.hover_btn.addEventListener('mousedown', hoverFn);
+        Cheat_Menu.hover_btn.addEventListener('touchstart', hoverFn, { passive: false });
         document.body.appendChild(Cheat_Menu.hover_btn);
     }
 

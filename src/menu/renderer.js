@@ -28,7 +28,7 @@ Cheat_Menu.update_menu = function () {
         btn.className = "sidebar_btn" + (Cheat_Menu.cheat_selected === i ? " active" : "");
         btn.innerHTML = names[i];
         let idx = i;
-        btn.addEventListener('mousedown', function (e) {
+        var sidebarFn = function (e) {
             e.preventDefault();
             if (Cheat_Menu.cheat_selected !== idx) {
                 Cheat_Menu.cheat_selected = idx;
@@ -36,7 +36,9 @@ Cheat_Menu.update_menu = function () {
                 SoundManager.playSystemSound(0);
                 Cheat_Menu.update_menu();
             }
-        });
+        };
+        btn.addEventListener('mousedown', sidebarFn);
+        btn.addEventListener('touchstart', sidebarFn, { passive: false });
         Cheat_Menu.sidebar.appendChild(btn);
     }
 

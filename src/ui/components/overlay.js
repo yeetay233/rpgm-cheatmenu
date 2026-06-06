@@ -161,11 +161,13 @@ Cheat_Menu.open_menu = function () {
         var closeBtn = document.createElement('button');
         closeBtn.id = "cheat_menu_close";
         closeBtn.innerHTML = "✖";
-        closeBtn.addEventListener('mousedown', function (e) {
+        var closeFn = function (e) {
             e.preventDefault();
             e.stopPropagation();
             Cheat_Menu.close_menu();
-        });
+        };
+        closeBtn.addEventListener('mousedown', closeFn);
+        closeBtn.addEventListener('touchstart', closeFn, { passive: false });
         cm.appendChild(closeBtn);
     }
 

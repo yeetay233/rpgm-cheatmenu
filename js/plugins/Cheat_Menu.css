@@ -464,25 +464,76 @@ BOTTOM BAR / AMOUNT CONTROLS
 
 .cheat_bottom_bar {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 4px;
     margin-top: 4px;
     padding-top: 4px;
     border-top: 1px solid #444;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .cheat_bottom_bar .cheat_controls {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    flex-shrink: 0;
 }
 
-.cheat_amount_group {
+.cheat_bottom_bar .cheat_label {
+    flex-shrink: 0;
+    font-size: 0.85em;
+    margin-right: 4px;
+}
+
+.cheat_bottom_bar .cheat_value {
+    min-width: 30px;
+    padding: 2px 4px;
+    font-size: 0.85em;
+}
+
+.cheat_bottom_bar .cheat_btn {
+    min-height: 30px;
+    font-size: 0.85em;
+}
+
+/* =========================================================
+ACTION GRID (Party Vitals / Enemy HP)
+========================================================= */
+
+.cheat_action_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.cheat_action_cell {
     display: flex;
+}
+
+.cheat_action_cell .cheat_btn {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    margin-right: auto;
+    justify-content: center;
+    padding: 6px 4px;
+    line-height: 1.3;
+    white-space: normal;
+    word-break: break-word;
+    min-height: 48px;
+    height: 100%;
+}
+
+.cheat_action_cell .cheat_btn small {
+    color: #888;
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
+.cheat_action_cell .cheat_btn:active small {
+    color: #ccc;
 }
 
 /* =========================================================
@@ -637,6 +688,21 @@ QUICK HUD / HOVER BUTTON
 .cheat_hud_btn:active {
     background: rgba(68, 204, 85, 0.5) !important;
     border-color: #44cc55;
+}
+
+.cheat_hud_drag {
+    cursor: move;
+    flex-shrink: 0;
+    touch-action: none;
+}
+
+.cheat_hud_drag:active {
+    cursor: grabbing;
+}
+
+.cheat_hud_ctrl {
+    flex-shrink: 0;
+    margin: 0 4px;
 }
 
 /* =========================================================
@@ -905,10 +971,23 @@ RESPONSIVE — narrow screens (JoiPlay / mobile)
         gap: 3px;
         margin-top: 3px;
         padding-top: 3px;
+        flex-wrap: wrap;
     }
 
-    .cheat_amount_group {
-        gap: 4px;
+    .cheat_bottom_bar .cheat_label {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .cheat_action_grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 3px;
+    }
+
+    .cheat_action_cell .cheat_btn {
+        min-height: 40px;
+        padding: 4px 3px;
+        font-size: 0.85em;
     }
 
     .cheat_settings_grid {
@@ -975,6 +1054,17 @@ EXTRA SMALL — tiny phones (360px and below)
     .cheat_search_container {
         padding-right: 18px;
         min-height: 60px;
+    }
+
+    .cheat_action_grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 2px;
+    }
+
+    .cheat_action_cell .cheat_btn {
+        min-height: 36px;
+        padding: 3px 2px;
+        font-size: 0.8em;
     }
 
     .cheat_scroll_arrow {
