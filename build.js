@@ -7,12 +7,19 @@ var fs = require('fs');
 var path = require('path');
 
 var srcDir = path.join(__dirname, 'src');
-var distDir = path.join(__dirname, 'js', 'plugins');
 
-// Ensure dist directory exists
-if (!fs.existsSync(distDir)) {
-    fs.mkdirSync(distDir, { recursive: true });
-}
+// Output directories (MV and MZ deployment paths)
+var distDirs = [
+    path.join(__dirname, 'cheat_menu', 'js', 'plugins'),
+    path.join(__dirname, 'cheat_menu', 'www', 'js', 'plugins')
+];
+
+// Ensure dist directories exist
+distDirs.forEach(function (d) {
+    if (!fs.existsSync(d)) {
+        fs.mkdirSync(d, { recursive: true });
+    }
+});
 
 // Module load order (dependencies first)
 var modules = [
@@ -90,21 +97,22 @@ for (var i = 0; i < modules.length; i++) {
     output += '\n\n';
 }
 
-// Write JS output
-var jsOutPath = path.join(distDir, 'Cheat_Menu.js');
-fs.writeFileSync(jsOutPath, output, 'utf8');
-console.log('Wrote ' + jsOutPath + ' (' + output.length + ' bytes)');
-
-// Copy CSS
+// Write JS and CSS to each output directory
 var cssSrcPath = path.join(srcDir, 'ui', 'styles', 'index.css');
-var cssOutPath = path.join(distDir, 'Cheat_Menu.css');
 
-if (fs.existsSync(cssSrcPath)) {
-    var cssContent = fs.readFileSync(cssSrcPath, 'utf8');
-    fs.writeFileSync(cssOutPath, cssContent, 'utf8');
-    console.log('Wrote ' + cssOutPath + ' (' + cssContent.length + ' bytes)');
-} else {
-    console.error('WARNING: CSS source not found: ' + cssSrcPath);
-}
+distDirs.forEach(function (distDir) {
+    var jsOutPath = path.join(distDir, 'Cheat_Menu.js');
+    fs.writeFileSync(jsOutPath, output, 'utf8');
+    console.log('Wrote ' + jsOutPath + ' (' + output.length + ' bytes)');
+
+    var cssOutPath = path.join(distDir, 'Cheat_Menu.css');
+    if (fs.existsSync(cssSrcPath)) {
+        var cssContent = fs.readFileSync(cssSrcPath, 'utf8');
+        fs.writeFileSync(cssOutPath, cssContent, 'utf8');
+        console.log('Wrote ' + cssOutPath + ' (' + cssContent.length + ' bytes)');
+    } else {
+        console.error('WARNING: CSS source not found: ' + cssSrcPath);
+    }
+});
 
 console.log('Build complete.');
