@@ -41,7 +41,7 @@ Cheat_Menu.create_page_combat_vitals = function () {
             btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
             btn.style.width = "100%";
             btn.style.height = "100%";
-            btn.style.padding = "6px 4px";
+            btn.style.padding = "4px 3px";
             btn.style.lineHeight = "1.3";
             btn.style.whiteSpace = "normal";
             btn.style.wordBreak = "break-word";
@@ -81,7 +81,7 @@ Cheat_Menu.create_page_combat_vitals = function () {
             btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
             btn.style.width = "100%";
             btn.style.height = "100%";
-            btn.style.padding = "6px 4px";
+            btn.style.padding = "4px 3px";
             btn.style.lineHeight = "1.3";
             btn.style.whiteSpace = "normal";
             btn.style.wordBreak = "break-word";

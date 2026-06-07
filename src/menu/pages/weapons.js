@@ -16,7 +16,10 @@ Cheat_Menu.create_page_weapons = function () {
         },
         function (item) { return item ? item.name : "NULL"; },
         true,
-        function (idx) { return "x" + ($gameParty._weapons[idx] || 0); }
+        function (idx) { return "x" + ($gameParty._weapons[idx] || 0); },
+        false,
+        null,
+        'weapons'
     );
     var qty = $gameParty._weapons[Cheat_Menu.weapon_selection] || 0;
     Cheat_Menu.append_bottom_bar_controls("Owned: " + qty,

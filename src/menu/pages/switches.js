@@ -34,6 +34,7 @@ Cheat_Menu.create_page_switches = function () {
             }
         },
         false,
-        'grid-wide'
+        'grid-wide',
+        'switches'
     );
 };

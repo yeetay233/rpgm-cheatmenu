@@ -36,7 +36,8 @@ Cheat_Menu.create_page_variables = function () {
             return $gameVariables.value(idx);
         },
         false,
-        'grid-wide'
+        'grid-wide',
+        'variables'
     );
     var current_val = $gameVariables.value(Cheat_Menu.variable_selection);
     if (typeof current_val === "string") {

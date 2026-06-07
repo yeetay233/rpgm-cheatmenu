@@ -16,7 +16,10 @@ Cheat_Menu.create_page_items = function () {
         },
         function (item) { return item ? item.name : "NULL"; },
         true,
-        function (idx) { return "x" + ($gameParty._items[idx] || 0); }
+        function (idx) { return "x" + ($gameParty._items[idx] || 0); },
+        false,
+        null,
+        'items'
     );
     var qty = $gameParty._items[Cheat_Menu.item_selection] || 0;
     Cheat_Menu.append_bottom_bar_controls("Owned: " + qty,

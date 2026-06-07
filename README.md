@@ -38,7 +38,7 @@
 1. **Copy** the entire contents of the `cheat_menu/` folder into your game's root folder (where `Game.exe` is located).
 
 2. **If you're on RPG Maker MV**, run `MVPluginPatcher.exe` inside your game folder — it will automatically register the plugin.
-> Note: Just in case, for RPG Maker MV, backup your plugins.js file located in `www/js/plugins/`.
+> Note: Just in case, for RPG Maker MV, backup your plugins.js file located in `www/js/`.
 
 3. **Launch the game** and press **`1`** on your keyboard, or click the **star icon** (★) in the bottom-right corner of the screen to open the cheat menu.
 
@@ -118,7 +118,7 @@ Cheat_Menu/
 ## Uninstall
 
 1. Delete `js/plugins/Cheat_Menu.js` and `js/plugins/Cheat_Menu.css` from your game folder (and from `www/js/plugins/` if present).
-2. Remove the `"Cheat_Menu"` entry from `js/plugins.js` (or restore your backup).
+2. Remove the `"Cheat_Menu"` entry from `www/js/plugins.js` (or restore your backup).
 
 ---
 

@@ -32,6 +32,9 @@ Cheat_Menu.initialize = function () {
     Cheat_Menu.btn_config = { ...Cheat_Menu.default_btn_config, ...Cheat_Menu.btn_config };
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
 
+    // Restore persistent state from localStorage
+    Cheat_Menu.load_saved_values();
+
     // Render hover button after a short delay (game canvas ready)
     setTimeout(Cheat_Menu.render_hover_button, 1000);
 };
@@ -41,7 +44,6 @@ DataManager.default_loadGame = DataManager.loadGame;
 DataManager.loadGame = function (savefileId) {
     Cheat_Menu.initialize();
     var result = DataManager.default_loadGame(savefileId);
-    Cheat_Menu.load_saved_values();
     Cheat_Menu.initialize_speed_lock();
     return result;
 };
@@ -51,13 +53,6 @@ DataManager.default_setupNewGame = DataManager.setupNewGame;
 DataManager.setupNewGame = function () {
     Cheat_Menu.initialize();
     DataManager.default_setupNewGame();
-};
-
-// Hook: Save Game
-DataManager.default_saveGame = DataManager.saveGame;
-DataManager.saveGame = function (savefileId) {
-    Cheat_Menu.save_values();
-    return DataManager.default_saveGame(savefileId);
 };
 
 // Window resize handler for menu positioning

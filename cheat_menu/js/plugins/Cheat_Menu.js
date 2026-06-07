@@ -31,6 +31,12 @@ Cheat_Menu.move_amount_index = 1;
 Cheat_Menu.variable_selection = 1;
 Cheat_Menu.switch_selection = 1;
 
+Cheat_Menu.pinned_items = [];
+Cheat_Menu.pinned_weapons = [];
+Cheat_Menu.pinned_armors = [];
+Cheat_Menu.pinned_variables = [];
+Cheat_Menu.pinned_switches = [];
+
 Cheat_Menu.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }];
 Cheat_Menu.teleport_location = { m: 1, x: 0, y: 0 };
 
@@ -86,27 +92,37 @@ Cheat_Menu._save_blacklist = [
     'sub_tab_per_group', 'list_state', '_page_titles'
 ];
 
-// Load saved values from $gameSystem
+// Load saved values from localStorage
 Cheat_Menu.load_saved_values = function () {
-    if ($gameSystem && $gameSystem.Cheat_Menu) {
-        for (var name in $gameSystem.Cheat_Menu) {
-            if (Cheat_Menu._save_blacklist.indexOf(name) !== -1) continue;
-            Cheat_Menu[name] = Cheat_Menu.clone_save_value($gameSystem.Cheat_Menu[name]);
+    try {
+        var raw = localStorage.getItem('Cheat_Menu');
+        if (raw) {
+            var saved = JSON.parse(raw);
+            for (var name in saved) {
+                if (Cheat_Menu._save_blacklist.indexOf(name) !== -1) continue;
+                Cheat_Menu[name] = Cheat_Menu.clone_save_value(saved[name]);
+            }
         }
+    } catch (e) {
+        // localStorage unavailable or corrupt - use defaults
     }
     // Ensure configs have defaults merged
     Cheat_Menu.btn_config = { ...Cheat_Menu.default_btn_config, ...Cheat_Menu.btn_config };
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
 };
 
-// Save current values to $gameSystem
+// Save current values to localStorage
 Cheat_Menu.save_values = function () {
-    if (!$gameSystem) return;
-    $gameSystem.Cheat_Menu = {};
-    for (var name in Cheat_Menu.initial_values) {
-        if (Cheat_Menu[name] !== undefined) {
-            $gameSystem.Cheat_Menu[name] = Cheat_Menu.clone_save_value(Cheat_Menu[name]);
+    try {
+        var data = {};
+        for (var name in Cheat_Menu.initial_values) {
+            if (Cheat_Menu[name] !== undefined) {
+                data[name] = Cheat_Menu.clone_save_value(Cheat_Menu[name]);
+            }
         }
+        localStorage.setItem('Cheat_Menu', JSON.stringify(data));
+    } catch (e) {
+        // localStorage full or unavailable
     }
 };
 
@@ -162,6 +178,11 @@ Cheat_Menu.initial_values = {
     move_amount_index: 1,
     variable_selection: 1,
     switch_selection: 1,
+    pinned_items: [],
+    pinned_weapons: [],
+    pinned_armors: [],
+    pinned_variables: [],
+    pinned_switches: [],
     saved_positions: [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }],
     teleport_location: { m: 1, x: 0, y: 0 },
     speed: null,
@@ -828,7 +849,10 @@ Cheat_Menu.open_confirm_modal = function (message, onConfirm) {
 // Cheat Menu - Searchable List Component
 // ============================================================
 
-Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCallback, getNameFunc, isGrid, getValueFunc, verticalLayout, extraClass) {
+var PIN_EMPTY = '<svg class="cpin" viewBox="0 0 16 16" width="11" height="11"><path d="M3 1 L13 1 L13 15 L8 11 L3 15 Z" fill="none" stroke="#888" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+var PIN_FILLED = '<svg class="cpin cpinned" viewBox="0 0 16 16" width="11" height="11"><path d="M3 1 L13 1 L13 15 L8 11 L3 15 Z" fill="#44cc55" stroke="none" stroke-linejoin="round"/></svg>';
+
+Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCallback, getNameFunc, isGrid, getValueFunc, verticalLayout, extraClass, listType) {
     var container = document.createElement('div');
     container.className = "cheat_search_container";
 
@@ -848,6 +872,15 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
 
     var focusedIndex = 0;
 
+    var getPinnedKey = function () {
+        if (listType === 'items') return 'pinned_items';
+        if (listType === 'weapons') return 'pinned_weapons';
+        if (listType === 'armors') return 'pinned_armors';
+        if (listType === 'variables') return 'pinned_variables';
+        if (listType === 'switches') return 'pinned_switches';
+        return null;
+    };
+
     var renderList = function (filterText) {
         listDiv.innerHTML = "";
         filterText = filterText.toLowerCase();
@@ -862,6 +895,24 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
             if (name && name.toLowerCase().indexOf(filterText) !== -1) {
                 visibleItems.push({ idx: i, name: name });
             }
+        }
+
+        var pinnedKey = getPinnedKey();
+        if (pinnedKey && Cheat_Menu[pinnedKey] && Cheat_Menu[pinnedKey].length > 0) {
+            var pinnedSet = {};
+            for (var p = 0; p < Cheat_Menu[pinnedKey].length; p++) {
+                pinnedSet[Cheat_Menu[pinnedKey][p]] = true;
+            }
+            var pinned = [];
+            var unpinned = [];
+            for (var v = 0; v < visibleItems.length; v++) {
+                if (pinnedSet[visibleItems[v].idx]) {
+                    pinned.push(visibleItems[v]);
+                } else {
+                    unpinned.push(visibleItems[v]);
+                }
+            }
+            visibleItems = pinned.concat(unpinned);
         }
 
         if (visibleItems.length === 0) {
@@ -886,6 +937,45 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
                 focusedIndex = v;
             }
             li.dataset.listIndex = v;
+
+            // Pin toggle button
+            if (pinnedKey) {
+                var pinBtn = document.createElement('span');
+                pinBtn.className = "cheat_pin_btn";
+                var isPinned = Cheat_Menu[pinnedKey].indexOf(item.idx) !== -1;
+                pinBtn.innerHTML = isPinned ? PIN_FILLED : PIN_EMPTY;
+                (function (idx, btn) {
+                    pinBtn.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var arr = Cheat_Menu[pinnedKey];
+                        var pos = arr.indexOf(idx);
+                        if (pos === -1) {
+                            arr.push(idx);
+                            btn.innerHTML = PIN_FILLED;
+                        } else {
+                            arr.splice(pos, 1);
+                            btn.innerHTML = PIN_EMPTY;
+                        }
+                        Cheat_Menu.save_values();
+                    });
+                    pinBtn.addEventListener('touchstart', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var arr = Cheat_Menu[pinnedKey];
+                        var pos = arr.indexOf(idx);
+                        if (pos === -1) {
+                            arr.push(idx);
+                            btn.innerHTML = PIN_FILLED;
+                        } else {
+                            arr.splice(pos, 1);
+                            btn.innerHTML = PIN_EMPTY;
+                        }
+                        Cheat_Menu.save_values();
+                    }, { passive: false });
+                })(item.idx, pinBtn);
+                li.appendChild(pinBtn);
+            }
 
             var labelSpan = document.createElement('span');
             labelSpan.className = "cheat_list_item_label";
@@ -1961,7 +2051,7 @@ Cheat_Menu.create_page_combat_vitals = function () {
             btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
             btn.style.width = "100%";
             btn.style.height = "100%";
-            btn.style.padding = "6px 4px";
+            btn.style.padding = "4px 3px";
             btn.style.lineHeight = "1.3";
             btn.style.whiteSpace = "normal";
             btn.style.wordBreak = "break-word";
@@ -2001,7 +2091,7 @@ Cheat_Menu.create_page_combat_vitals = function () {
             btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
             btn.style.width = "100%";
             btn.style.height = "100%";
-            btn.style.padding = "6px 4px";
+            btn.style.padding = "4px 3px";
             btn.style.lineHeight = "1.3";
             btn.style.whiteSpace = "normal";
             btn.style.wordBreak = "break-word";
@@ -2330,7 +2420,10 @@ Cheat_Menu.create_page_items = function () {
         },
         function (item) { return item ? item.name : "NULL"; },
         true,
-        function (idx) { return "x" + ($gameParty._items[idx] || 0); }
+        function (idx) { return "x" + ($gameParty._items[idx] || 0); },
+        false,
+        null,
+        'items'
     );
     var qty = $gameParty._items[Cheat_Menu.item_selection] || 0;
     Cheat_Menu.append_bottom_bar_controls("Owned: " + qty,
@@ -2374,7 +2467,10 @@ Cheat_Menu.create_page_weapons = function () {
         },
         function (item) { return item ? item.name : "NULL"; },
         true,
-        function (idx) { return "x" + ($gameParty._weapons[idx] || 0); }
+        function (idx) { return "x" + ($gameParty._weapons[idx] || 0); },
+        false,
+        null,
+        'weapons'
     );
     var qty = $gameParty._weapons[Cheat_Menu.weapon_selection] || 0;
     Cheat_Menu.append_bottom_bar_controls("Owned: " + qty,
@@ -2418,7 +2514,10 @@ Cheat_Menu.create_page_armors = function () {
         },
         function (item) { return item ? item.name : "NULL"; },
         true,
-        function (idx) { return "x" + ($gameParty._armors[idx] || 0); }
+        function (idx) { return "x" + ($gameParty._armors[idx] || 0); },
+        false,
+        null,
+        'armors'
     );
     var qty = $gameParty._armors[Cheat_Menu.armor_selection] || 0;
     Cheat_Menu.append_bottom_bar_controls("Owned: " + qty,
@@ -2482,7 +2581,8 @@ Cheat_Menu.create_page_variables = function () {
             return $gameVariables.value(idx);
         },
         false,
-        'grid-wide'
+        'grid-wide',
+        'variables'
     );
     var current_val = $gameVariables.value(Cheat_Menu.variable_selection);
     if (typeof current_val === "string") {
@@ -2556,7 +2656,8 @@ Cheat_Menu.create_page_switches = function () {
             }
         },
         false,
-        'grid-wide'
+        'grid-wide',
+        'switches'
     );
 };
 
@@ -3283,6 +3384,9 @@ Cheat_Menu.initialize = function () {
     Cheat_Menu.btn_config = { ...Cheat_Menu.default_btn_config, ...Cheat_Menu.btn_config };
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
 
+    // Restore persistent state from localStorage
+    Cheat_Menu.load_saved_values();
+
     // Render hover button after a short delay (game canvas ready)
     setTimeout(Cheat_Menu.render_hover_button, 1000);
 };
@@ -3292,7 +3396,6 @@ DataManager.default_loadGame = DataManager.loadGame;
 DataManager.loadGame = function (savefileId) {
     Cheat_Menu.initialize();
     var result = DataManager.default_loadGame(savefileId);
-    Cheat_Menu.load_saved_values();
     Cheat_Menu.initialize_speed_lock();
     return result;
 };
@@ -3302,13 +3405,6 @@ DataManager.default_setupNewGame = DataManager.setupNewGame;
 DataManager.setupNewGame = function () {
     Cheat_Menu.initialize();
     DataManager.default_setupNewGame();
-};
-
-// Hook: Save Game
-DataManager.default_saveGame = DataManager.saveGame;
-DataManager.saveGame = function (savefileId) {
-    Cheat_Menu.save_values();
-    return DataManager.default_saveGame(savefileId);
 };
 
 // Window resize handler for menu positioning

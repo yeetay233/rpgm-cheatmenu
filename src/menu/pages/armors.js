@@ -16,7 +16,10 @@ Cheat_Menu.create_page_armors = function () {
         },
         function (item) { return item ? item.name : "NULL"; },
         true,
-        function (idx) { return "x" + ($gameParty._armors[idx] || 0); }
+        function (idx) { return "x" + ($gameParty._armors[idx] || 0); },
+        false,
+        null,
+        'armors'
     );
     var qty = $gameParty._armors[Cheat_Menu.armor_selection] || 0;
     Cheat_Menu.append_bottom_bar_controls("Owned: " + qty,
