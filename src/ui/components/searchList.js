@@ -169,8 +169,8 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
 
         var itemHeight = isGrid ? 26 : VIRTUAL_ITEM_HEIGHT;
 
-        if (visibleItems.length > VIRTUAL_THRESHOLD) {
-            var scrollTop = listDiv.scrollTop || 0;
+        if (visibleItems.length > VIRTUAL_THRESHOLD && !isGrid) {
+            var scrollTop = Cheat_Menu.list_state.scroll || 0;
             var viewH = listDiv.clientHeight || 400;
             var visCount = Math.ceil(viewH / itemHeight);
             var start = Math.max(0, Math.floor(scrollTop / itemHeight) - VIRTUAL_BUFFER);
@@ -186,6 +186,7 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
             if (end < visibleItems.length) {
                 listDiv.appendChild(buildSpacer((visibleItems.length - end) * itemHeight));
             }
+            listDiv.scrollTop = scrollTop;
         } else {
             for (var vj = 0; vj < visibleItems.length; vj++) {
                 var li2 = buildItemElement(visibleItems[vj], vj);

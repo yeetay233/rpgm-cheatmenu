@@ -3,6 +3,9 @@
 // ============================================================
 
 Cheat_Menu.initialize_speed_lock = function () {
+    if (Cheat_Menu.speed === null || typeof Cheat_Menu.speed !== 'number') {
+        Cheat_Menu.speed_initialized = false;
+    }
     if (!Cheat_Menu.speed_initialized) {
         Cheat_Menu.speed = $gamePlayer._moveSpeed;
         Object.defineProperty($gamePlayer, "_moveSpeed", {

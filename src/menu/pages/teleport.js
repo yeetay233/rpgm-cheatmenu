@@ -17,11 +17,7 @@ Cheat_Menu.create_page_teleport = function () {
         },
         function (item, idx) { return item ? item.name : "Map " + idx; },
         true,
-        function (idx) {
-            if (idx === Cheat_Menu.teleport_location.m) {
-                return "<font color='#44cc55'>selected</font>";
-            }
-        },
+        null,
         null, null, "teleport"
     );
 

@@ -19,6 +19,7 @@ Cheat_Menu.register_pages = function () {
         Cheat_Menu.create_page_armors,
         Cheat_Menu.create_page_variables,
         Cheat_Menu.create_page_switches,
+        Cheat_Menu.create_page_saves,
         Cheat_Menu.create_page_save_recall,
         Cheat_Menu.create_page_teleport,
         Cheat_Menu.create_page_clear_states,
@@ -34,7 +35,8 @@ Cheat_Menu.register_pages = function () {
         "Armors",
         "Variables",
         "Switches",
-        "Save and Recall",
+        "States",
+        "Location",
         "Teleport",
         "Clear States",
         "Interface"
@@ -162,11 +164,12 @@ Cheat_Menu.group_menus_by_umbrella = function () {
 
     var groups = {
         "Inventory": { keys: ["items", "weapon", "armor"], items: [] },
-        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "state", "states", "combat"], items: [] },
-        "Progression": { keys: ["exp", "stat", "gold", "progression"], items: [] },
+        "Combat & Vitals": { keys: ["hp", "mp", "tp", "enemy", "party", "god mode", "god", "clear", "combat"], items: [] },
+        "Progression": { keys: ["exp", "gold", "progression"], items: [] },
         "Variables & Switches": { keys: ["variable", "switch"], items: [] },
         "Movement": { keys: ["movement", "no clip", "speed", "noclip"], items: [] },
-        "Navigation": { keys: ["save and recall", "teleport", "recall"], items: [] },
+        "Saves": { keys: ["saves", "savestate", "states", "location", "recall"], items: [] },
+        "Navigation": { keys: ["teleport"], items: [] },
         "Settings": { keys: ["settings", "interface", "quick actions hud", "general"], items: [] }
     };
 
@@ -250,6 +253,7 @@ Cheat_Menu.group_menus_by_umbrella = function () {
     createUmbrella("Variables & Switches", groups["Variables & Switches"].items);
     createUmbrella("Movement", groups["Movement"].items);
     createUmbrella("Navigation", groups["Navigation"].items);
+    createUmbrella("Saves", groups["Saves"].items);
     createUmbrella("Settings", groups["Settings"].items);
 
     for (var k = 0; k < uncategorized.length; k++) {

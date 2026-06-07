@@ -34,6 +34,8 @@ Cheat_Menu.initialize = function () {
 
     // Restore persistent state from localStorage
     Cheat_Menu.load_saved_values();
+    // Restore savestates from separate localStorage key
+    if (Cheat_Menu.restore_savestates) Cheat_Menu.restore_savestates();
 
     // Render hover button after a short delay (game canvas ready)
     setTimeout(Cheat_Menu.render_hover_button, 1000);
@@ -44,6 +46,15 @@ DataManager.default_loadGame = DataManager.loadGame;
 DataManager.loadGame = function (savefileId) {
     Cheat_Menu.initialize();
     var result = DataManager.default_loadGame(savefileId);
+    // MZ's loadGame can return a Promise (async storage via IndexedDB).
+    // If so, defer initialize_speed_lock until the data is actually loaded
+    // so the getter/setter is defined on the *new* $gamePlayer instance.
+    if (result && typeof result.then === 'function') {
+        return result.then(function (v) {
+            Cheat_Menu.initialize_speed_lock();
+            return v;
+        });
+    }
     Cheat_Menu.initialize_speed_lock();
     return result;
 };

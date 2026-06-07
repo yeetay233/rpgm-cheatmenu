@@ -3,7 +3,7 @@
 // ============================================================
 
 Cheat_Menu.create_page_save_recall = function () {
-    Cheat_Menu.append_cheat_title("Save and Recall");
+    Cheat_Menu.append_cheat_title("Location");
 
     for (var i = 0; i < Cheat_Menu.saved_positions.length; i++) {
         var pos = Cheat_Menu.saved_positions[i];

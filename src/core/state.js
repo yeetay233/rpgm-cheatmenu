@@ -32,6 +32,9 @@ Cheat_Menu.pinned_variables = [];
 Cheat_Menu.pinned_switches = [];
 Cheat_Menu.pinned_teleport_maps = [];
 
+Cheat_Menu.savestates = new Array(10).fill(null);
+Cheat_Menu.quick_savestate = null;
+
 Cheat_Menu.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }];
 Cheat_Menu.teleport_location = { m: 1, x: 0, y: 0 };
 
@@ -84,7 +87,7 @@ Cheat_Menu.reset_to_initial = function () {
 // Properties to never overwrite from save data (dynamically generated)
 Cheat_Menu._save_blacklist = [
     'menus', 'menu_names', '_menus_grouped', '_pages_registered',
-    'sub_tab_per_group', 'list_state', '_page_titles'
+    'sub_tab_per_group', 'list_state', '_page_titles', 'savestates', 'quick_savestate'
 ];
 
 // Load saved values from localStorage

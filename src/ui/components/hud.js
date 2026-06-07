@@ -80,6 +80,29 @@ Cheat_Menu.hud_actions = {
     'close_menu': {
         title: 'Close Menu',
         fn: function () { Cheat_Menu.close_menu(); }
+    },
+    'quick_save': {
+        title: 'Quick Save',
+        fn: function () {
+            if (!DataManager || !DataManager.makeSaveContents) return;
+            var captured = Cheat_Menu.capture_savestate();
+            if (captured) {
+                Cheat_Menu.quick_savestate = captured;
+                if (Cheat_Menu.persist_savestates) Cheat_Menu.persist_savestates();
+                SoundManager.playSystemSound(1);
+            }
+        }
+    },
+    'quick_load': {
+        title: 'Quick Load',
+        fn: function () {
+            var s = Cheat_Menu.quick_savestate;
+            if (!s) {
+                SoundManager.playSystemSound(2);
+                return;
+            }
+            Cheat_Menu.load_savestate(s);
+        }
     }
 };
 

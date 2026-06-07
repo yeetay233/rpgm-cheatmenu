@@ -33,6 +33,7 @@ var modules = [
     'cheats/inventory.js',
     'cheats/movement.js',
     'cheats/system.js',
+    'cheats/savestate.js',
 
     // UI Components
     'ui/components/overlay.js',
@@ -59,6 +60,7 @@ var modules = [
     'menu/pages/variables.js',
     'menu/pages/switches.js',
     'menu/pages/saveRecall.js',
+    'menu/pages/saves.js',
     'menu/pages/teleport.js',
     'menu/pages/clearStates.js',
     'menu/pages/general.js',
