@@ -30,8 +30,9 @@ Cheat_Menu.pinned_weapons = [];
 Cheat_Menu.pinned_armors = [];
 Cheat_Menu.pinned_variables = [];
 Cheat_Menu.pinned_switches = [];
+Cheat_Menu.pinned_teleport_maps = [];
 
-Cheat_Menu.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }];
+Cheat_Menu.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }];
 Cheat_Menu.teleport_location = { m: 1, x: 0, y: 0 };
 
 Cheat_Menu.speed = null;
@@ -103,6 +104,12 @@ Cheat_Menu.load_saved_values = function () {
     // Ensure configs have defaults merged
     Cheat_Menu.btn_config = { ...Cheat_Menu.default_btn_config, ...Cheat_Menu.btn_config };
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
+    // Pad saved_positions to 10 for backward compatibility with older saves
+    if (Cheat_Menu.saved_positions) {
+        while (Cheat_Menu.saved_positions.length < 10) {
+            Cheat_Menu.saved_positions.push({ m: -1, x: -1, y: -1 });
+        }
+    }
 };
 
 // Save current values to localStorage

@@ -1,49 +1,73 @@
 /* =========================================================
-CHEAT MENU LAYOUT
+CHEAT MENU - Design System
+========================================================= */
+
+:root {
+  --bg-root: rgba(15, 15, 15, 0.92);
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+  --bg-input: #1e1e1e;
+  --accent: #44cc55;
+  --accent-dim: rgba(68, 204, 85, 0.2);
+  --accent-glow: rgba(68, 204, 85, 0.35);
+  --text-primary: #eee;
+  --text-dim: #999;
+  --text-accent: #44cc55;
+  --border: #3a3a3a;
+  --border-light: #555;
+  --btn-bg: #2a2a2a;
+  --btn-bg-hover: #3a3a3a;
+  --btn-bg-active: #44cc55;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+}
+
+/* =========================================================
+LAYOUT
 ========================================================= */
 
 #cheat_menu {
-    position: absolute;
-    width: 70vw;
-    height: 70vh;
-    max-width: 1200px;
-    z-index: 1000;
-    display: flex;
-    overflow: hidden;
-    font-family: sans-serif;
-    font-size: 14px;
-    color: #ffffff;
-    background-color: rgba(20, 20, 20, 0.9);
-    border: 1px solid #444;
-    border-radius: 8px;
+  position: absolute;
+  width: 70vw;
+  height: 70vh;
+  max-width: 1200px;
+  z-index: 1000;
+  display: flex;
+  overflow: hidden;
+  font-family: sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background-color: var(--bg-root);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
 #cheat_menu * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 #cheat_menu_sidebar {
-    position: relative;
-    width: 150px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    background-color: rgba(10, 10, 10, 0.95);
-    border-right: 1px solid #444;
+  position: relative;
+  width: 130px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: rgba(10, 10, 10, 0.95);
+  border-right: 1px solid var(--border);
 }
 
 #cheat_menu_content {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 6px;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 6px;
 }
 
 /* =========================================================
@@ -51,114 +75,311 @@ SIDEBAR
 ========================================================= */
 
 .sidebar_btn {
-    background: none;
-    border: none;
-    border-bottom: 1px solid #333;
-    color: #ccc;
-    cursor: pointer;
-    font-size: 1em;
-    padding: 8px;
-    text-align: left;
-    min-height: 44px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid #2a2a2a;
+  color: #bbb;
+  cursor: pointer;
+  font-size: 0.82em;
+  padding: 6px 8px;
+  text-align: left;
+  min-height: 38px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .sidebar_btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #fff;
 }
 
 .sidebar_btn:active {
-    background-color: rgba(68, 204, 85, 0.2);
+  background-color: var(--accent-dim);
 }
 
 .sidebar_btn.active {
-    background-color: rgba(68, 204, 85, 0.3);
-    border-left: 3px solid #44cc55;
-    color: #44cc55;
+  background-color: rgba(68, 204, 85, 0.12);
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* =========================================================
-TITLES / ROWS / COMMON CONTROLS
+PAGE TITLE
 ========================================================= */
 
 .cheat_menu_title {
-    margin-bottom: 6px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid #555;
-    color: #44cc55;
-    font-size: 1.3em;
-    font-weight: bold;
-    text-align: center;
-    word-break: break-word;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 1.1em;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-align: center;
+  word-break: break-word;
 }
 
+/* =========================================================
+SECTION HEADER (subsection divider)
+========================================================= */
+
+.cheat_sub_header {
+  margin: 2px 0 1px 0;
+  padding: 3px 4px 1px 4px;
+  border-bottom: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.78em;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+CONTROL GRID — Standardized 2-column block
+========================================================= */
+
+.cheat_control_grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  min-height: 34px;
+}
+
+.cheat_control_grid:hover {
+  background: var(--bg-card-hover);
+}
+
+.cheat_control_label {
+  font-size: 0.88em;
+  color: var(--text-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 4px;
+}
+
+.cheat_control_label .cheat_val {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.cheat_control_actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 130px;
+}
+
+.cheat_btn_row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+}
+
+/* =========================================================
+LEGACY ROW — mapped to control grid
+========================================================= */
+
 .cheat_row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    margin-bottom: 4px;
-    padding: 4px 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  align-items: center;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  min-height: 34px;
+}
+
+.cheat_row:hover {
+  background: var(--bg-card-hover);
 }
 
 .cheat_label {
-    flex: 1;
-    font-size: 1em;
-    min-width: 0;
+  font-size: 0.88em;
+  color: var(--text-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cheat_controls {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
 }
 
+/* =========================================================
+BUTTONS
+========================================================= */
+
 .cheat_btn {
-    padding: 4px 8px;
-    min-height: 34px;
-    min-width: 36px;
-    background-color: #333;
-    border: 1px solid #555;
-    border-radius: 4px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 0.95em;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
+  padding: 3px 7px;
+  min-height: 30px;
+  min-width: 32px;
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.85em;
+  line-height: 1.2;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.12s, border-color 0.12s;
 }
 
 .cheat_btn:hover {
-    background-color: #555;
-    border-color: #777;
+  background-color: var(--btn-bg-hover);
+  border-color: var(--border-light);
 }
 
 .cheat_btn:active {
-    background-color: #44cc55;
-    border-color: #44cc55;
+  background-color: var(--btn-bg-active);
+  border-color: var(--btn-bg-active);
+  color: #111;
+  font-weight: bold;
 }
 
+.cheat_btn small {
+  font-size: 0.8em;
+  margin-top: 1px;
+}
+
+/* =========================================================
+VALUE DISPLAY
+========================================================= */
+
 .cheat_value {
-    min-width: 36px;
-    min-height: 28px;
-    padding: 3px 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid #444;
-    border-radius: 4px;
-    color: #44cc55;
-    font-size: 0.95em;
-    text-align: center;
-    word-break: break-word;
+  min-width: 30px;
+  min-height: 26px;
+  padding: 2px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 0.85em;
+  text-align: center;
+  word-break: break-word;
+  line-height: 1.1;
+}
+
+/* =========================================================
+SETTING ROW
+========================================================= */
+
+.cheat_setting_row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  align-items: center;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  min-height: 34px;
+}
+
+.cheat_setting_row:hover {
+  background: var(--bg-card-hover);
+}
+
+.cheat_setting_row .cheat_label {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.88em;
+  font-weight: normal;
+}
+
+.cheat_setting_row .cheat_controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* =========================================================
+MODIFIER ROW (value + step controls)
+========================================================= */
+
+.cheat_modifier_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  white-space: nowrap;
+  padding: 6px 0;
+  margin-bottom: 3px;
+  min-height: 34px;
+  gap: 8px;
+}
+
+.modifier_group_left {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.modifier_group_right {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.cheat_modifier_value {
+  font-size: 0.88em;
+  color: var(--text-primary);
+  padding-right: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cheat_modifier_step_label {
+  font-size: 0.78em;
+  color: var(--text-dim);
+  padding-right: 2px;
+  white-space: nowrap;
+}
+
+.cheat_modifier_row .cheat_btn {
+  min-height: 26px;
+  font-size: 0.82em;
+  padding: 2px 5px;
+}
+
+/* =========================================================
+PROGRESSION SECTION
+========================================================= */
+
+.cheat_progression_section {
+  margin: 3px 0;
+  padding: 3px 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 /* =========================================================
@@ -166,31 +387,31 @@ VERTICAL LIST LAYOUT (Variables / Switches)
 ========================================================= */
 
 .cheat_list.vertical {
-    display: block;
+  display: block;
 }
 
 .cheat_list.vertical .cheat_list_item {
-    display: block;
-    padding: 3px 8px;
-    min-height: 0;
-    border-bottom: 1px solid #222;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    background: none;
-    border-radius: 0;
-    line-height: 1.3;
+  display: block;
+  padding: 2px 6px;
+  min-height: 0;
+  border-bottom: 1px solid #1e1e1e;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  background: none;
+  border-radius: 0;
+  line-height: 1.2;
 }
 
 .cheat_list.vertical .cheat_list_item .cheat_list_item_val {
-    display: block;
-    margin: 0;
-    color: #888;
-    font-size: 0.85em;
-    word-break: break-word;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  display: block;
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.82em;
+  word-break: break-word;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* =========================================================
@@ -198,394 +419,356 @@ SEARCH / LISTS
 ========================================================= */
 
 .cheat_search_container {
-    position: relative;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-    min-height: 0;
-    overflow: hidden;
-    margin-bottom: 6px;
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  margin-bottom: 4px;
 }
 
 .cheat_search_input {
-    width: 100%;
-    padding: 6px;
-    min-height: 36px;
-    background: #222;
-    border: 1px solid #555;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 0.95em;
-    touch-action: manipulation;
+  width: 100%;
+  padding: 5px;
+  min-height: 32px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.88em;
+  touch-action: manipulation;
+}
+
+.cheat_search_input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .cheat_list {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    background: #111;
-    border: 1px solid #444;
-    border-radius: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #0f0f0f;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .cheat_list_item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    padding: 2px 4px;
-    min-height: 30px;
-    border-bottom: 1px solid #222;
-    cursor: pointer;
-    font-size: 0.9em;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 2px 4px;
+  min-height: 28px;
+  border-bottom: 1px solid #1e1e1e;
+  cursor: pointer;
+  font-size: 0.88em;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cheat_list_item_label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cheat_list_item:hover {
-    background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .cheat_list_item:active {
-    background: rgba(68, 204, 85, 0.2);
+  background: var(--accent-dim);
 }
 
 .cheat_list_item.selected {
-    background: rgba(68, 204, 85, 0.3);
-    color: #44cc55;
+  background: rgba(68, 204, 85, 0.2);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .cheat_pin_btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .cheat_pin_btn:active {
-    opacity: 0.6;
+  opacity: 0.5;
 }
 
 .cheat_pin_btn .cpin {
-    display: block;
-    pointer-events: none;
+  display: block;
+  pointer-events: none;
 }
 
 .cheat_pin_btn .cpin.cpinned {
-    filter: drop-shadow(0 0 1px rgba(68, 204, 85, 0.4));
+  filter: drop-shadow(0 0 1px rgba(68, 204, 85, 0.4));
 }
 
 .cheat_list_item_val {
-    margin-top: 0;
-    color: #888;
-    font-size: 0.85em;
-    flex-shrink: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 40%;
-    text-align: right;
+  margin-top: 0;
+  color: var(--text-dim);
+  font-size: 0.82em;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40%;
+  text-align: right;
+}
+
+.cheat_list_header {
+  padding: 3px 4px 1px 4px;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: bold;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--accent);
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  user-select: none;
+  list-style: none;
 }
 
 /* =========================================================
-GRID LISTS
+GRID LISTS (Items/Weapons/Armors)
 ========================================================= */
 
 .cheat_list.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    align-content: start;
-    gap: 3px;
-    padding: 3px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  align-content: start;
+  gap: 2px;
+  padding: 2px;
 }
 
 .cheat_list.grid .cheat_list_item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 3px 4px;
-    min-height: 28px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid #333;
-    border-radius: 3px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 3px;
+  min-height: 26px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #2a2a2a;
+  border-radius: var(--radius-sm);
 }
 
 .cheat_list.grid .cheat_list_item_label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.9em;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85em;
 }
 
 .cheat_list.grid .cheat_list_item_val {
-    margin: 0;
-    color: #44cc55;
-    font-size: 0.85em;
-    font-weight: bold;
-    text-align: right;
-    flex-shrink: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 40%;
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.82em;
+  font-weight: bold;
+  text-align: right;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 35%;
 }
 
 /* Wide grid for variables/switches */
 .cheat_list.grid-wide {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    align-content: start;
-    gap: 3px;
-    padding: 3px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-content: start;
+  gap: 2px;
+  padding: 2px;
 }
 
 .cheat_list.grid-wide .cheat_list_item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 6px;
-    min-height: 32px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid #333;
-    border-radius: 3px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 5px;
+  min-height: 28px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #2a2a2a;
+  border-radius: var(--radius-sm);
 }
 
 .cheat_list.grid-wide .cheat_list_item_label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.9em;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85em;
 }
 
 .cheat_list.grid-wide .cheat_list_item_val {
-    margin: 0;
-    color: #44cc55;
-    font-size: 0.9em;
-    font-weight: bold;
-    text-align: right;
-    flex-shrink: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 40%;
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.85em;
+  font-weight: bold;
+  text-align: right;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 35%;
 }
 
 /* =========================================================
-SUB TABS / UMBRELLA GROUPS
+SUB TABS
 ========================================================= */
 
 .cheat_sub_nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    margin-bottom: 6px;
-    padding-bottom: 0;
-    border-bottom: 2px solid #444;
-    flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 4px;
+  padding-bottom: 0;
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
 }
 
 .cheat_sub_tab {
-    padding: 6px 10px;
-    min-height: 36px;
-    background: #1a1a1a;
-    border: 1px solid #444;
-    border-bottom: none;
-    border-radius: 5px 5px 0 0;
-    color: #888;
-    cursor: pointer;
-    font-size: 0.9em;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+  padding: 5px 8px;
+  min-height: 32px;
+  background: rgba(30, 30, 30, 0.8);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.82em;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s, color 0.12s;
 }
 
 .cheat_sub_tab:hover {
-    background: #2a2a2a;
-    color: #fff;
+  background: rgba(50, 50, 50, 0.8);
+  color: var(--text-primary);
 }
 
 .cheat_sub_tab:active {
-    background: rgba(68, 204, 85, 0.15);
+  background: var(--accent-dim);
 }
 
 .cheat_sub_tab.active {
-    margin-bottom: -2px;
-    background: rgba(68, 204, 85, 0.2);
-    border-color: #44cc55;
-    border-bottom: 2px solid rgba(68, 204, 85, 0.2);
-    color: #44cc55;
-}
-
-.cheat_sub_header {
-    margin: 6px 4px 3px 4px;
-    padding-bottom: 2px;
-    border-bottom: 1px solid #44cc55;
-    color: #44cc55;
-    font-size: 1em;
-    font-weight: bold;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.cheat_progression_section {
-    margin: 6px 0;
-    padding: 4px 6px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid #333;
-    border-radius: 6px;
+  margin-bottom: -2px;
+  background: rgba(68, 204, 85, 0.12);
+  border-color: var(--accent);
+  border-bottom: 2px solid rgba(68, 204, 85, 0.12);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* =========================================================
-SETTINGS-SPECIFIC ROWS
+COMBAT COLUMNS (Party Vitals / Enemy HP — Alive / All)
 ========================================================= */
 
-.cheat_setting_row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    margin-bottom: 4px;
-    padding: 4px 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #333;
-    border-radius: 4px;
+.cheat_combat_section {
+  flex-shrink: 0;
+  margin-bottom: 6px;
 }
 
-.cheat_setting_row .cheat_label {
-    margin: 0;
-    color: #ccc;
-    font-size: 0.95em;
-    font-weight: bold;
+.cheat_combat_row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
 }
 
-.cheat_setting_row .cheat_controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.cheat_combat_column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
+
+.cheat_combat_header {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--accent);
+  text-align: center;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+}
+
+.cheat_combat_column .cheat_btn {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+}
+
+/* =========================================================
+TELEPORT COORD CLUSTER (X/Y side-by-side)
+========================================================= */
+
+.cheat_coord_cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.cheat_coord_cluster .cheat_val_xy {
+  color: var(--text-dim);
+  font-size: 0.78em;
+  margin-right: 1px;
+}
+
+.cheat_coord_cluster .cheat_btn {
+  min-width: 24px;
+  padding: 1px 4px;
+  font-size: 0.8em;
+  min-height: 24px;
+}
+
+.cheat_coord_cluster .cheat_value {
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0 3px;
+  font-size: 0.8em;
+}
+
+/* =========================================================
+SETTINGS GRID (Quick Actions HUD button grid)
+========================================================= */
 
 .cheat_settings_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 4px;
-    margin-top: 4px;
-}
-
-/* =========================================================
-BOTTOM BAR / AMOUNT CONTROLS
-========================================================= */
-
-.cheat_bottom_bar {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 4px;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px solid #444;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.cheat_bottom_bar .cheat_controls {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    flex-shrink: 0;
-}
-
-.cheat_bottom_bar .cheat_label {
-    flex-shrink: 0;
-    font-size: 0.85em;
-    margin-right: 4px;
-}
-
-.cheat_bottom_bar .cheat_value {
-    min-width: 30px;
-    padding: 2px 4px;
-    font-size: 0.85em;
-    min-height: 24px;
-}
-
-.cheat_bottom_bar .cheat_btn {
-    min-height: 30px;
-    font-size: 0.85em;
-    padding: 3px 6px;
-}
-
-/* =========================================================
-ACTION GRID (Party Vitals / Enemy HP)
-========================================================= */
-
-.cheat_action_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 4px;
-    margin-bottom: 4px;
-    overflow: hidden;
-}
-
-.cheat_action_cell {
-    display: flex;
-}
-
-.cheat_action_cell .cheat_btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 3px;
-    line-height: 1.2;
-    white-space: normal;
-    word-break: break-word;
-    min-height: 38px;
-    height: 100%;
-}
-
-.cheat_action_cell .cheat_btn small {
-    font-size: 0.8em;
-    margin-top: 2px;
-}
-
-.cheat_action_cell .cheat_btn small.tag-alive {
-    color: #66ccff;
-}
-
-.cheat_action_cell .cheat_btn small.tag-all {
-    color: #ff8844;
-}
-
-.cheat_action_cell .cheat_btn:active small {
-    color: #ccc;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 3px;
+  margin-top: 3px;
 }
 
 /* =========================================================
@@ -593,41 +776,42 @@ MODALS
 ========================================================= */
 
 .cheat_modal_bg {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.7);
-    touch-action: manipulation;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  touch-action: manipulation;
 }
 
 .cheat_modal {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 250px;
-    max-width: calc(100% - 20px);
-    padding: 16px;
-    background: #222;
-    border: 1px solid #555;
-    border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 240px;
+  max-width: calc(100% - 20px);
+  padding: 14px;
+  background: #1e1e1e;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
 .cheat_modal_title {
-    color: #44cc55;
-    font-weight: bold;
-    text-align: center;
+  color: var(--accent);
+  font-weight: bold;
+  text-align: center;
+  font-size: 0.95em;
 }
 
 .cheat_modal_buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
 }
 
 /* =========================================================
@@ -635,32 +819,69 @@ RESIZE HANDLE
 ========================================================= */
 
 #cheat_menu_resize_handle {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 18px;
-    height: 18px;
-    cursor: nwse-resize;
-    z-index: 1002;
-    touch-action: none;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    padding: 2px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  z-index: 1002;
+  touch-action: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 2px;
 }
 
 #cheat_menu_resize_handle::after {
-    content: "";
-    display: block;
-    width: 10px;
-    height: 10px;
-    border-right: 2px solid rgba(255, 255, 255, 0.5);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
 }
 
 #cheat_menu_resize_handle:hover::after,
 #cheat_menu_resize_handle:active::after {
-    border-color: #44cc55;
+  border-color: var(--accent);
+}
+
+/* =========================================================
+CLOSE BUTTON
+========================================================= */
+
+#cheat_menu_close {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  z-index: 1001;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 18px;
+  line-height: 1;
+  user-select: none;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 50%;
+}
+
+#cheat_menu_close:hover {
+  background: rgba(255, 50, 50, 0.15);
+  color: #ff4444;
+}
+
+#cheat_menu_close:active {
+  background: rgba(255, 50, 50, 0.3);
+  color: #ff2222;
 }
 
 /* =========================================================
@@ -668,118 +889,83 @@ QUICK HUD / HOVER BUTTON
 ========================================================= */
 
 #cheat_hover_btn {
-    position: fixed;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(20, 20, 20, 0.8);
-    border: 1px solid #555;
-    border-radius: 50%;
-    color: #ffffff;
-    cursor: pointer;
-    line-height: 1;
-    text-align: center;
-    user-select: none;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  line-height: 1;
+  text-align: center;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #cheat_quick_hud {
-    position: fixed;
-    left: 0;
-    z-index: 998;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2px;
-    padding: 3px 4px;
-    box-sizing: border-box;
-    pointer-events: none;
+  position: fixed;
+  left: 0;
+  z-index: 998;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 3px;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 .cheat_hud_btn {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 1px 5px;
-    min-height: 26px;
-    background: rgba(20, 20, 20, 0.75);
-    border: 1px solid #444;
-    border-radius: 4px;
-    color: #ddd;
-    cursor: pointer;
-    font-family: sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    pointer-events: auto;
-    appearance: none;
-    -webkit-appearance: none;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 4px;
+  min-height: 24px;
+  background: rgba(20, 20, 20, 0.75);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: #ddd;
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .cheat_hud_btn:hover {
-    background: rgba(68, 204, 85, 0.35) !important;
-    border-color: #44cc55;
-    color: #fff;
+  background: var(--accent-glow) !important;
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .cheat_hud_btn:active {
-    background: rgba(68, 204, 85, 0.5) !important;
-    border-color: #44cc55;
-    color: #fff;
+  background: rgba(68, 204, 85, 0.5) !important;
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .cheat_hud_ctrl {
-    flex-shrink: 0;
-    min-width: 22px;
-    text-align: center;
-    padding: 1px 3px;
+  flex-shrink: 0;
+  min-width: 20px;
+  text-align: center;
+  padding: 1px 2px;
 }
 
 .cheat_hud_drag {
-    cursor: grab;
+  cursor: grab;
 }
 .cheat_hud_drag:active {
-    cursor: grabbing;
-}
-
-
-/* =========================================================
-CLOSE BUTTON
-========================================================= */
-
-#cheat_menu_close {
-    position: absolute;
-    top: 6px;
-    right: 10px;
-    z-index: 1001;
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-family: sans-serif;
-    font-size: 20px;
-    line-height: 1;
-    user-select: none;
-    min-width: 36px;
-    min-height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-}
-
-#cheat_menu_close:hover {
-    color: #ff4444;
-}
-
-#cheat_menu_close:active {
-    color: #ff2222;
+  cursor: grabbing;
 }
 
 /* =========================================================
@@ -787,383 +973,422 @@ SCROLLBARS
 ========================================================= */
 
 ::-webkit-scrollbar {
-    width: 6px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #111;
+  background: #0d0d0d;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 3px;
+  background: #444;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #777;
+  background: #666;
 }
 
 /* =========================================================
-SCROLL BUTTONS — sidebar/content sticky in-flow ▲/▼
+SCROLL BUTTONS
 ========================================================= */
 
 .cheat_scroll_btn {
-    position: sticky;
-    z-index: 5;
-    flex-shrink: 0;
-    display: block;
-    width: 30%;
-    height: 25px;
-    min-height: 25px;
-    padding: 0 8px;
-    margin: 0 auto;
-    background: #333;
-    border: none;
-    outline: 1px solid rgba(68, 204, 85, 0.4);
-    color: #aaa;
-    cursor: pointer;
-    font-size: 9px;
-    line-height: 25px;
-    text-align: center;
-    box-sizing: border-box;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    opacity: 0;
+  position: sticky;
+  z-index: 5;
+  flex-shrink: 0;
+  display: block;
+  width: 28%;
+  height: 22px;
+  min-height: 22px;
+  padding: 0 6px;
+  margin: 0 auto;
+  background: #2a2a2a;
+  border: none;
+  outline: 1px solid rgba(68, 204, 85, 0.35);
+  color: #aaa;
+  cursor: pointer;
+  font-size: 8px;
+  line-height: 22px;
+  text-align: center;
+  box-sizing: border-box;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0;
 }
 
 .cheat_scroll_btn:hover,
 .cheat_scroll_btn:active {
-    background: #444;
-    color: #44cc55;
+  background: #3a3a3a;
+  color: var(--accent);
 }
 
 .scb_up {
-    top: 0;
-    border-bottom: 1px solid #333;
+  top: 0;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .scb_down {
-    bottom: 0;
-    border-top: 1px solid #333;
+  bottom: 0;
+  border-top: 1px solid #2a2a2a;
 }
 
-/* =========================================================
-LIST SCROLL COLUMN — 30px right-side bar for .cheat_list
-========================================================= */
-
+/* List scroll wrapper */
 .cheat_list_wrapper {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    overflow: hidden;
-    min-height: 0;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .cheat_list_wrapper > .cheat_list {
-    flex: 1;
-    overflow-y: auto;
-    border-radius: 0;
-    border-right: none;
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 0;
+  border-right: none;
 }
 
 /* Sidebar columnized layout */
 #cheat_menu_sidebar.cheat_sb_row {
-    flex-direction: row;
-    overflow: hidden;
+  flex-direction: row;
+  overflow: hidden;
 }
 
 .cheat_sb_content {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-/* Scroll column — shared by sidebar and lists */
+/* Scroll column */
 .cheat_scroll_column {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 28px;
-    flex-shrink: 0;
-    background: #151515;
-    border-left: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  flex-shrink: 0;
+  background: #121212;
+  border-left: 1px solid #2a2a2a;
 }
 
 .cheat_scroll_column .cheat_scroll_col_btn {
-    flex: 0 0 35%;
-    min-height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    background: #333;
-    border: none;
-    border-bottom: 1px solid #333;
-    outline: 1px solid rgba(68, 204, 85, 0.4);
-    color: #aaa;
-    cursor: pointer;
-    font-size: 10px;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    opacity: 0;
+  flex: 0 0 35%;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: #2a2a2a;
+  border: none;
+  border-bottom: 1px solid #2a2a2a;
+  outline: 1px solid rgba(68, 204, 85, 0.35);
+  color: #aaa;
+  cursor: pointer;
+  font-size: 9px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0;
 }
 
 .cheat_scroll_column .cheat_scroll_col_btn:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .cheat_scroll_column .cheat_scroll_col_btn:hover,
 .cheat_scroll_column .cheat_scroll_col_btn:active {
-    background: rgba(68, 204, 85, 0.12);
-    color: #44cc55;
+  background: rgba(68, 204, 85, 0.1);
+  color: var(--accent);
 }
 
 /* =========================================================
-RESPONSIVE — narrow screens (JoiPlay / mobile)
+RESPONSIVE — narrow screens
 ========================================================= */
 
 @media screen and (max-width: 500px) {
-    #cheat_menu_sidebar {
-        width: 110px;
-    }
+  #cheat_menu_sidebar {
+    width: 100px;
+  }
 
-    .sidebar_btn {
-        font-size: 0.82em;
-        padding: 6px;
-        min-height: 36px;
-    }
+  .sidebar_btn {
+    font-size: 0.78em;
+    padding: 5px 6px;
+    min-height: 34px;
+  }
 
-    .sidebar_btn.active {
-        border-left-width: 2px;
-    }
+  .sidebar_btn.active {
+    border-left-width: 2px;
+  }
 
-    .cheat_menu_title {
-        font-size: 1.1em;
-        margin-bottom: 6px;
-    }
+  .cheat_menu_title {
+    font-size: 1em;
+    margin-bottom: 3px;
+  }
 
-    .cheat_sub_tab {
-        padding: 5px 8px;
-        font-size: 0.8em;
-        min-height: 32px;
-    }
+  .cheat_sub_header {
+    font-size: 0.72em;
+  }
 
-    .cheat_row,
-    .cheat_setting_row {
-        flex-wrap: wrap;
-        align-items: flex-start;
-        padding: 3px 5px;
-        margin-bottom: 3px;
-    }
+  .cheat_sub_tab {
+    padding: 4px 6px;
+    font-size: 0.76em;
+    min-height: 28px;
+  }
 
-    .cheat_controls {
-        width: 100%;
-        justify-content: flex-end;
-        gap: 3px;
-    }
+  .cheat_control_grid,
+  .cheat_row,
+  .cheat_setting_row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px 8px;
+    padding: 2px 4px;
+    min-height: 30px;
+    margin-bottom: 2px;
+  }
 
-    .cheat_btn {
-        padding: 3px 6px;
-        min-height: 30px;
-        min-width: 30px;
-        font-size: 0.85em;
-    }
+  .cheat_control_label,
+  .cheat_label {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    font-size: 0.82em;
+  }
 
-    .cheat_value {
-        min-width: 28px;
-        min-height: 24px;
-        padding: 2px 4px;
-        font-size: 0.85em;
-    }
+  .cheat_control_actions,
+  .cheat_controls {
+    flex: 0 1 auto;
+    min-width: 0;
+    gap: 2px;
+  }
 
-    #cheat_menu_content {
-        padding: 4px;
-        padding-right: 24px;
-    }
+  .cheat_btn_row {
+    gap: 2px;
+  }
 
-    .cheat_search_container {
-        padding-right: 24px;
-        gap: 3px;
-    }
+  .cheat_btn {
+    padding: 2px 5px;
+    min-height: 26px;
+    min-width: 28px;
+    font-size: 0.8em;
+  }
 
-    .cheat_search_input {
-        padding: 5px;
-        min-height: 32px;
-        font-size: 0.85em;
-    }
+  .cheat_value {
+    min-width: 26px;
+    min-height: 22px;
+    padding: 1px 3px;
+    font-size: 0.8em;
+  }
 
-    .cheat_list_item {
-        min-height: 28px;
-        padding: 2px 3px;
-        font-size: 0.82em;
-    }
+  #cheat_menu_content {
+    padding: 3px 4px;
+    padding-right: 20px;
+  }
 
-    .cheat_list.grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 2px;
-        padding: 2px;
-    }
+  .cheat_search_container {
+    padding-right: 20px;
+    gap: 2px;
+  }
 
-    .cheat_list.grid .cheat_list_item {
-        min-height: 24px;
-        padding: 2px 3px;
-    }
+  .cheat_search_input {
+    padding: 4px;
+    min-height: 28px;
+    font-size: 0.82em;
+  }
 
-    .cheat_list.grid-wide {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    }
+  .cheat_list_item {
+    min-height: 26px;
+    padding: 2px 3px;
+    font-size: 0.82em;
+  }
 
-    .cheat_list.grid-wide .cheat_list_item {
-        min-height: 28px;
-        padding: 3px 5px;
-    }
+  .cheat_list.grid {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 2px;
+    padding: 2px;
+  }
 
-    .cheat_list.grid-wide .cheat_list_item_label,
-    .cheat_list.grid .cheat_list_item_label {
-        font-size: 0.82em;
-    }
+  .cheat_list.grid .cheat_list_item {
+    min-height: 24px;
+    padding: 2px 3px;
+  }
 
-    .cheat_hud_btn {
-        padding: 2px 5px;
-        min-height: 28px;
-        font-size: 11px;
-    }
+  .cheat_list.grid-wide {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
 
-    #cheat_menu_close {
-        top: 4px;
-        right: 6px;
-        min-width: 32px;
-        min-height: 32px;
-        font-size: 17px;
-    }
+  .cheat_list.grid-wide .cheat_list_item {
+    min-height: 26px;
+    padding: 2px 4px;
+  }
 
-    #cheat_menu_resize_handle {
-        width: 16px;
-        height: 16px;
-    }
+  .cheat_hud_btn {
+    padding: 1px 4px;
+    min-height: 24px;
+    font-size: 10px;
+  }
 
-    #cheat_menu_resize_handle::after {
-        width: 8px;
-        height: 8px;
-    }
+  #cheat_menu_close {
+    top: 3px;
+    right: 5px;
+    min-width: 28px;
+    min-height: 28px;
+    font-size: 15px;
+  }
 
-    .cheat_bottom_bar {
-        gap: 3px;
-        margin-top: 3px;
-        padding-top: 3px;
-        flex-wrap: wrap;
-    }
+  #cheat_menu_resize_handle {
+    width: 14px;
+    height: 14px;
+  }
 
-    .cheat_bottom_bar .cheat_label {
-        width: 100%;
-        margin-right: 0;
-    }
+  #cheat_menu_resize_handle::after {
+    width: 7px;
+    height: 7px;
+  }
 
-    .cheat_bottom_bar .cheat_controls {
-        flex-shrink: 1;
-        flex-wrap: wrap;
-    }
+  .cheat_modifier_row {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px 0;
+    min-height: 28px;
+  }
 
-    .cheat_bottom_bar .cheat_controls .cheat_btn {
-        flex: 0 1 auto;
-        min-width: 0;
-    }
+  .modifier_group_left {
+    flex-wrap: wrap;
+  }
 
-    .cheat_action_grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 3px;
-    }
+  .modifier_group_right {
+    flex-shrink: 1;
+  }
 
-    .cheat_action_cell .cheat_btn {
-        min-height: 38px;
-        padding: 4px 3px;
-        font-size: 0.85em;
-    }
+  .cheat_combat_row {
+    gap: 4px;
+  }
 
-    .cheat_settings_grid {
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        gap: 3px;
-    }
+  .cheat_combat_section {
+    margin-bottom: 4px;
+  }
+
+  .cheat_combat_column .cheat_btn {
+    min-height: 30px;
+    padding: 3px 6px;
+    font-size: 0.78rem;
+  }
+
+  .cheat_coord_cluster .cheat_btn {
+    min-width: 22px;
+    padding: 1px 3px;
+    min-height: 22px;
+  }
+
+  .cheat_coord_cluster .cheat_value {
+    min-width: 18px;
+    min-height: 18px;
+    font-size: 0.76em;
+  }
+
+  .cheat_settings_grid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 2px;
+  }
+
+  .cheat_progression_section {
+    margin: 2px 0;
+    padding: 2px 3px;
+  }
 }
 
-/* =========================================================
-EXTRA SMALL — tiny phones (360px and below)
-========================================================= */
-
+/* extreme small */
 @media screen and (max-width: 360px) {
-    .cheat_bottom_bar .cheat_controls {
-        width: 100%;
-        justify-content: flex-start;
-    }
+  .cheat_modifier_row .modifier_group_left {
+    width: 100%;
+    justify-content: flex-start;
+  }
 
-    #cheat_menu_sidebar {
-        width: 90px;
-    }
+  #cheat_menu_sidebar {
+    width: 80px;
+  }
 
-    .sidebar_btn {
-        font-size: 0.75em;
-        padding: 5px 4px;
-        min-height: 30px;
-    }
+  .sidebar_btn {
+    font-size: 0.72em;
+    padding: 4px 4px;
+    min-height: 28px;
+  }
 
-    #cheat_menu_content {
-        padding: 3px;
-        padding-right: 20px;
-    }
+  #cheat_menu_content {
+    padding: 2px 3px;
+    padding-right: 16px;
+  }
 
-    .cheat_menu_title {
-        font-size: 0.95em;
-        margin-bottom: 4px;
-    }
+  .cheat_menu_title {
+    font-size: 0.9em;
+    margin-bottom: 2px;
+  }
 
-    .cheat_sub_tab {
-        padding: 4px 6px;
-        font-size: 0.75em;
-        min-height: 28px;
-    }
+  .cheat_sub_tab {
+    padding: 3px 5px;
+    font-size: 0.72em;
+    min-height: 26px;
+  }
 
-    .cheat_btn {
-        padding: 2px 5px;
-        min-height: 26px;
-        min-width: 26px;
-        font-size: 0.8em;
-    }
+  .cheat_btn {
+    padding: 2px 4px;
+    min-height: 24px;
+    min-width: 24px;
+    font-size: 0.78em;
+  }
 
-    .cheat_row,
-    .cheat_setting_row {
-        padding: 2px 4px;
-        margin-bottom: 2px;
-        gap: 3px;
-    }
+  .cheat_combat_column .cheat_btn {
+    min-height: 28px;
+    padding: 2px 5px;
+    font-size: 0.75rem;
+  }
 
-    .cheat_list.grid {
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    }
+  .cheat_control_grid,
+  .cheat_row,
+  .cheat_setting_row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3px 6px;
+    padding: 2px 3px;
+    min-height: 26px;
+    margin-bottom: 1px;
+  }
 
-    .cheat_list_item {
-        min-height: 24px;
-        padding: 1px 2px;
-        font-size: 0.78em;
-    }
+  .cheat_list.grid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  }
 
-    .cheat_search_container {
-        padding-right: 18px;
-    }
+  .cheat_list_item {
+    min-height: 22px;
+    padding: 1px 2px;
+    font-size: 0.76em;
+  }
 
-    .cheat_action_grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        gap: 2px;
-    }
+  .cheat_search_container {
+    padding-right: 14px;
+  }
 
-    .cheat_action_cell .cheat_btn {
-        min-height: 34px;
-        padding: 3px 2px;
-        font-size: 0.8em;
-    }
+  .cheat_coord_cluster .cheat_btn {
+    min-width: 20px;
+    padding: 0 2px;
+    min-height: 20px;
+    font-size: 0.74em;
+  }
+
+  .cheat_coord_cluster .cheat_value {
+    min-width: 16px;
+    min-height: 16px;
+    font-size: 0.72em;
+  }
 }

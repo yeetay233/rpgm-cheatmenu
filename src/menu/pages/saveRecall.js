@@ -16,30 +16,28 @@ Cheat_Menu.create_page_save_recall = function () {
         }
 
         var row = document.createElement('div');
-        row.className = "cheat_row";
+        row.className = "cheat_control_grid";
 
         var label = document.createElement('div');
-        label.className = "cheat_label";
-        label.style.flex = "1";
-        label.style.fontSize = "0.85em";
-        label.style.overflow = "hidden";
-        label.style.textOverflow = "ellipsis";
-        label.style.whiteSpace = "nowrap";
+        label.className = "cheat_control_label";
         label.innerHTML = slotLabel;
 
-        var controls = document.createElement('div');
-        controls.className = "cheat_controls";
+        var actions = document.createElement('div');
+        actions.className = "cheat_control_actions";
+
+        var btnRow = document.createElement('div');
+        btnRow.className = "cheat_btn_row";
 
         var btnSave = document.createElement('button');
         btnSave.className = "cheat_btn";
         btnSave.innerHTML = "Save";
-        btnSave.style.minWidth = "50px";
+        btnSave.style.minWidth = "44px";
         Cheat_Menu.addEvent(btnSave, Cheat_Menu.save_position.bind(null, i));
 
         var btnRecall = document.createElement('button');
         btnRecall.className = "cheat_btn";
         btnRecall.innerHTML = "Recall";
-        btnRecall.style.minWidth = "55px";
+        btnRecall.style.minWidth = "50px";
         if (pos.m !== -1) {
             btnRecall.style.borderColor = "#44cc55";
         } else {
@@ -65,10 +63,11 @@ Cheat_Menu.create_page_save_recall = function () {
             };
         })(i));
 
-        controls.appendChild(btnSave);
-        controls.appendChild(btnRecall);
+        btnRow.appendChild(btnSave);
+        btnRow.appendChild(btnRecall);
+        actions.appendChild(btnRow);
         row.appendChild(label);
-        row.appendChild(controls);
+        row.appendChild(actions);
         Cheat_Menu.content.appendChild(row);
     }
 };

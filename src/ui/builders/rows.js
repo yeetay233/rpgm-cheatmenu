@@ -51,87 +51,122 @@ Cheat_Menu.append_description = function (text) {
     Cheat_Menu.content.appendChild(desc_div);
 };
 
+// Standardized control row: label left, button right
 Cheat_Menu.append_cheat = function (cheat_text, status_text, key, click_handler) {
     var row = document.createElement('div');
-    row.className = "cheat_row";
+    row.className = "cheat_control_grid";
 
     var label = document.createElement('div');
-    label.className = "cheat_label";
+    label.className = "cheat_control_label";
     label.innerHTML = cheat_text;
+
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btn = document.createElement('button');
     btn.className = "cheat_btn";
     btn.innerHTML = status_text;
     Cheat_Menu.addEvent(btn, click_handler);
 
+    btnRow.appendChild(btn);
+    actions.appendChild(btnRow);
+
     row.appendChild(label);
-    row.appendChild(btn);
+    row.appendChild(actions);
 
     Cheat_Menu.content.appendChild(row);
 };
 
+// Scroll selector: ◄ value ► [+ Apply] — compact grid row
 Cheat_Menu.append_scroll_selector = function (text, key1, key2, scroll_handler, apply_handler) {
     var row = document.createElement('div');
-    row.className = "cheat_row";
+    row.className = "cheat_control_grid";
+
+    var label = document.createElement('div');
+    label.className = "cheat_control_label";
+    label.innerHTML = text;
+
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btnLeft = document.createElement('button');
     btnLeft.className = "cheat_btn";
-    btnLeft.innerHTML = "←";
+    btnLeft.innerHTML = "◄";
     Cheat_Menu.addEvent(btnLeft, scroll_handler.bind(null, "left"));
 
     var centerText = document.createElement('div');
     centerText.className = "cheat_value";
-    centerText.innerHTML = text;
-    centerText.style.flex = "1";
-    centerText.style.margin = "0 10px";
+    centerText.innerHTML = text.replace(/^.*?: /, '');
+    centerText.style.minWidth = "28px";
 
     var btnRight = document.createElement('button');
     btnRight.className = "cheat_btn";
-    btnRight.innerHTML = "→";
+    btnRight.innerHTML = "►";
     Cheat_Menu.addEvent(btnRight, scroll_handler.bind(null, "right"));
 
-    row.appendChild(btnLeft);
-    row.appendChild(centerText);
-    row.appendChild(btnRight);
+    btnRow.appendChild(btnLeft);
+    btnRow.appendChild(centerText);
+    btnRow.appendChild(btnRight);
 
     if (apply_handler) {
         var btnApply = document.createElement('button');
         btnApply.className = "cheat_btn";
         btnApply.innerHTML = "Apply";
-        btnApply.style.marginLeft = "10px";
         Cheat_Menu.addEvent(btnApply, apply_handler);
-        row.appendChild(btnApply);
+        btnRow.appendChild(btnApply);
     }
+
+    actions.appendChild(btnRow);
+    row.appendChild(label);
+    row.appendChild(actions);
 
     Cheat_Menu.content.appendChild(row);
 };
 
+Cheat_Menu.append_sub_header = function (text) {
+    var el = document.createElement('div');
+    el.className = "cheat_sub_header";
+    el.innerHTML = text;
+    Cheat_Menu.content.appendChild(el);
+};
+
+// Simple add/remove row: label left, [-amount] [+amount] right
 Cheat_Menu.append_add_remove = function (text, amount, onApply) {
     var row = document.createElement('div');
-    row.className = "cheat_row";
+    row.className = "cheat_control_grid";
 
     var label = document.createElement('div');
-    label.className = "cheat_label";
+    label.className = "cheat_control_label";
     label.innerHTML = text;
 
-    var controls = document.createElement('div');
-    controls.className = "cheat_controls";
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btnRemove = document.createElement('button');
     btnRemove.className = "cheat_btn";
-    btnRemove.innerHTML = "- " + amount;
+    btnRemove.innerHTML = "-" + amount;
     Cheat_Menu.addEvent(btnRemove, function () { onApply("left"); });
 
     var btnAdd = document.createElement('button');
     btnAdd.className = "cheat_btn";
-    btnAdd.innerHTML = "+ " + amount;
+    btnAdd.innerHTML = "+" + amount;
     Cheat_Menu.addEvent(btnAdd, function () { onApply("right"); });
 
-    controls.appendChild(btnRemove);
-    controls.appendChild(btnAdd);
+    btnRow.appendChild(btnRemove);
+    btnRow.appendChild(btnAdd);
+    actions.appendChild(btnRow);
 
     row.appendChild(label);
-    row.appendChild(controls);
+    row.appendChild(actions);
 
     Cheat_Menu.content.appendChild(row);
 };

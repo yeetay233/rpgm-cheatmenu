@@ -36,8 +36,9 @@ Cheat_Menu.pinned_weapons = [];
 Cheat_Menu.pinned_armors = [];
 Cheat_Menu.pinned_variables = [];
 Cheat_Menu.pinned_switches = [];
+Cheat_Menu.pinned_teleport_maps = [];
 
-Cheat_Menu.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }];
+Cheat_Menu.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }];
 Cheat_Menu.teleport_location = { m: 1, x: 0, y: 0 };
 
 Cheat_Menu.speed = null;
@@ -109,6 +110,12 @@ Cheat_Menu.load_saved_values = function () {
     // Ensure configs have defaults merged
     Cheat_Menu.btn_config = { ...Cheat_Menu.default_btn_config, ...Cheat_Menu.btn_config };
     Cheat_Menu.hud_config = { ...Cheat_Menu.default_hud_config, ...Cheat_Menu.hud_config };
+    // Pad saved_positions to 10 for backward compatibility with older saves
+    if (Cheat_Menu.saved_positions) {
+        while (Cheat_Menu.saved_positions.length < 10) {
+            Cheat_Menu.saved_positions.push({ m: -1, x: -1, y: -1 });
+        }
+    }
 };
 
 // Save current values to localStorage
@@ -183,7 +190,8 @@ Cheat_Menu.initial_values = {
     pinned_armors: [],
     pinned_variables: [],
     pinned_switches: [],
-    saved_positions: [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }],
+    pinned_teleport_maps: [],
+    saved_positions: [{ m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }, { m: -1, x: -1, y: -1 }],
     teleport_location: { m: 1, x: 0, y: 0 },
     speed: null,
     speed_unlocked: true,
@@ -852,6 +860,10 @@ Cheat_Menu.open_confirm_modal = function (message, onConfirm) {
 var PIN_EMPTY = '<svg class="cpin" viewBox="0 0 16 16" width="11" height="11"><path d="M3 1 L13 1 L13 15 L8 11 L3 15 Z" fill="none" stroke="#888" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 var PIN_FILLED = '<svg class="cpin cpinned" viewBox="0 0 16 16" width="11" height="11"><path d="M3 1 L13 1 L13 15 L8 11 L3 15 Z" fill="#44cc55" stroke="none" stroke-linejoin="round"/></svg>';
 
+var VIRTUAL_ITEM_HEIGHT = 28;
+var VIRTUAL_BUFFER = 40;
+var VIRTUAL_THRESHOLD = 80;
+
 Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCallback, getNameFunc, isGrid, getValueFunc, verticalLayout, extraClass, listType) {
     var container = document.createElement('div');
     container.className = "cheat_search_container";
@@ -871,6 +883,8 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
     listDiv.tabIndex = -1;
 
     var focusedIndex = 0;
+    var _rendering = false;
+    var _debounceTimer = null;
 
     var getPinnedKey = function () {
         if (listType === 'items') return 'pinned_items';
@@ -878,20 +892,98 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
         if (listType === 'armors') return 'pinned_armors';
         if (listType === 'variables') return 'pinned_variables';
         if (listType === 'switches') return 'pinned_switches';
+        if (listType === 'teleport') return 'pinned_teleport_maps';
         return null;
     };
 
+    function buildItemElement(item, virtualIndex) {
+        var li = document.createElement('li');
+        li.className = "cheat_list_item";
+        if (item.idx === selectedIdx) {
+            li.className += " selected";
+            focusedIndex = virtualIndex;
+        }
+        li.dataset.listIndex = virtualIndex;
+
+        var pinnedKey = getPinnedKey();
+        if (pinnedKey) {
+            var pinBtn = document.createElement('span');
+            pinBtn.className = "cheat_pin_btn";
+            var isPinned = Cheat_Menu[pinnedKey].indexOf(item.idx) !== -1;
+            pinBtn.innerHTML = isPinned ? PIN_FILLED : PIN_EMPTY;
+            (function (idx, btn) {
+                pinBtn.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var arr = Cheat_Menu[pinnedKey];
+                    var pos = arr.indexOf(idx);
+                    if (pos === -1) {
+                        arr.push(idx);
+                        btn.innerHTML = PIN_FILLED;
+                    } else {
+                        arr.splice(pos, 1);
+                        btn.innerHTML = PIN_EMPTY;
+                    }
+                    Cheat_Menu.save_values();
+                });
+                pinBtn.addEventListener('touchstart', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var arr = Cheat_Menu[pinnedKey];
+                    var pos = arr.indexOf(idx);
+                    if (pos === -1) {
+                        arr.push(idx);
+                        btn.innerHTML = PIN_FILLED;
+                    } else {
+                        arr.splice(pos, 1);
+                        btn.innerHTML = PIN_EMPTY;
+                    }
+                    Cheat_Menu.save_values();
+                }, { passive: false });
+            })(item.idx, pinBtn);
+            li.appendChild(pinBtn);
+        }
+
+        var labelSpan = document.createElement('span');
+        labelSpan.className = "cheat_list_item_label";
+        labelSpan.innerHTML = item.idx + ": " + item.name;
+        li.appendChild(labelSpan);
+
+        if (getValueFunc) {
+            var valDiv = document.createElement('div');
+            valDiv.className = "cheat_list_item_val";
+            valDiv.innerHTML = getValueFunc(item.idx);
+            li.appendChild(valDiv);
+        }
+
+        (function (idx) {
+            Cheat_Menu.addEvent(li, function (e) {
+                e.preventDefault();
+                onSelectCallback(idx);
+            });
+        })(item.idx);
+        return li;
+    }
+
+    function buildSpacer(height) {
+        var s = document.createElement('li');
+        s.style.height = height + "px";
+        s.style.listStyle = "none";
+        s.style.pointerEvents = "none";
+        return s;
+    }
+
     var renderList = function (filterText) {
+        if (_rendering) return;
+        _rendering = true;
         listDiv.innerHTML = "";
         filterText = filterText.toLowerCase();
 
         var visibleItems = [];
         for (var i = 1; i < dataArray.length; i++) {
             if (!dataArray[i]) continue;
-
             var name = getNameFunc ? getNameFunc(dataArray[i], i) : (dataArray[i].name || dataArray[i]);
             if (typeof name !== "string") name = String(name);
-
             if (name && name.toLowerCase().indexOf(filterText) !== -1) {
                 visibleItems.push({ idx: i, name: name });
             }
@@ -923,80 +1015,48 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
             emptyLi.style.cursor = "default";
             emptyLi.innerHTML = "No results";
             listDiv.appendChild(emptyLi);
+            _rendering = false;
             return;
         }
 
         searchInput.placeholder = "Search (" + visibleItems.length + " results)...";
+        focusedIndex = -1;
 
-        for (var v = 0; v < visibleItems.length; v++) {
-            var item = visibleItems[v];
-            var li = document.createElement('li');
-            li.className = "cheat_list_item";
-            if (item.idx === selectedIdx) {
-                li.className += " selected";
-                focusedIndex = v;
+        var itemHeight = isGrid ? 26 : VIRTUAL_ITEM_HEIGHT;
+
+        if (visibleItems.length > VIRTUAL_THRESHOLD) {
+            var scrollTop = listDiv.scrollTop || 0;
+            var viewH = listDiv.clientHeight || 400;
+            var visCount = Math.ceil(viewH / itemHeight);
+            var start = Math.max(0, Math.floor(scrollTop / itemHeight) - VIRTUAL_BUFFER);
+            var end = Math.min(visibleItems.length, Math.ceil((scrollTop + viewH) / itemHeight) + VIRTUAL_BUFFER);
+
+            if (start > 0) {
+                listDiv.appendChild(buildSpacer(start * itemHeight));
             }
-            li.dataset.listIndex = v;
-
-            // Pin toggle button
-            if (pinnedKey) {
-                var pinBtn = document.createElement('span');
-                pinBtn.className = "cheat_pin_btn";
-                var isPinned = Cheat_Menu[pinnedKey].indexOf(item.idx) !== -1;
-                pinBtn.innerHTML = isPinned ? PIN_FILLED : PIN_EMPTY;
-                (function (idx, btn) {
-                    pinBtn.addEventListener('mousedown', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var arr = Cheat_Menu[pinnedKey];
-                        var pos = arr.indexOf(idx);
-                        if (pos === -1) {
-                            arr.push(idx);
-                            btn.innerHTML = PIN_FILLED;
-                        } else {
-                            arr.splice(pos, 1);
-                            btn.innerHTML = PIN_EMPTY;
-                        }
-                        Cheat_Menu.save_values();
-                    });
-                    pinBtn.addEventListener('touchstart', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var arr = Cheat_Menu[pinnedKey];
-                        var pos = arr.indexOf(idx);
-                        if (pos === -1) {
-                            arr.push(idx);
-                            btn.innerHTML = PIN_FILLED;
-                        } else {
-                            arr.splice(pos, 1);
-                            btn.innerHTML = PIN_EMPTY;
-                        }
-                        Cheat_Menu.save_values();
-                    }, { passive: false });
-                })(item.idx, pinBtn);
-                li.appendChild(pinBtn);
+            for (var vi = start; vi < end; vi++) {
+                var li = buildItemElement(visibleItems[vi], vi);
+                listDiv.appendChild(li);
             }
-
-            var labelSpan = document.createElement('span');
-            labelSpan.className = "cheat_list_item_label";
-            labelSpan.innerHTML = item.idx + ": " + item.name;
-            li.appendChild(labelSpan);
-
-            if (getValueFunc) {
-                var valDiv = document.createElement('div');
-                valDiv.className = "cheat_list_item_val";
-                valDiv.innerHTML = getValueFunc(item.idx);
-                li.appendChild(valDiv);
+            if (end < visibleItems.length) {
+                listDiv.appendChild(buildSpacer((visibleItems.length - end) * itemHeight));
             }
-
-            (function (idx) {
-                Cheat_Menu.addEvent(li, function (e) {
-                    e.preventDefault();
-                    onSelectCallback(idx);
-                });
-            })(item.idx);
-            listDiv.appendChild(li);
+        } else {
+            for (var vj = 0; vj < visibleItems.length; vj++) {
+                var li2 = buildItemElement(visibleItems[vj], vj);
+                listDiv.appendChild(li2);
+            }
         }
+
+        _rendering = false;
+    };
+
+    var scheduleRender = function (filterText) {
+        if (_debounceTimer) clearTimeout(_debounceTimer);
+        _debounceTimer = setTimeout(function () {
+            _debounceTimer = null;
+            renderList(filterText);
+        }, 16);
     };
 
     searchInput.addEventListener('input', function (e) {
@@ -1030,13 +1090,14 @@ Cheat_Menu.append_searchable_list = function (dataArray, selectedIdx, onSelectCa
 
     listDiv.onscroll = function () {
         Cheat_Menu.list_state.scroll = listDiv.scrollTop;
+        scheduleRender(Cheat_Menu.list_state.search);
     };
-
-    renderList(Cheat_Menu.list_state.search);
 
     container.appendChild(searchInput);
     container.appendChild(listDiv);
     Cheat_Menu.content.appendChild(container);
+
+    renderList(Cheat_Menu.list_state.search);
 };
 
 
@@ -1710,87 +1771,122 @@ Cheat_Menu.append_description = function (text) {
     Cheat_Menu.content.appendChild(desc_div);
 };
 
+// Standardized control row: label left, button right
 Cheat_Menu.append_cheat = function (cheat_text, status_text, key, click_handler) {
     var row = document.createElement('div');
-    row.className = "cheat_row";
+    row.className = "cheat_control_grid";
 
     var label = document.createElement('div');
-    label.className = "cheat_label";
+    label.className = "cheat_control_label";
     label.innerHTML = cheat_text;
+
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btn = document.createElement('button');
     btn.className = "cheat_btn";
     btn.innerHTML = status_text;
     Cheat_Menu.addEvent(btn, click_handler);
 
+    btnRow.appendChild(btn);
+    actions.appendChild(btnRow);
+
     row.appendChild(label);
-    row.appendChild(btn);
+    row.appendChild(actions);
 
     Cheat_Menu.content.appendChild(row);
 };
 
+// Scroll selector: ◄ value ► [+ Apply] — compact grid row
 Cheat_Menu.append_scroll_selector = function (text, key1, key2, scroll_handler, apply_handler) {
     var row = document.createElement('div');
-    row.className = "cheat_row";
+    row.className = "cheat_control_grid";
+
+    var label = document.createElement('div');
+    label.className = "cheat_control_label";
+    label.innerHTML = text;
+
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btnLeft = document.createElement('button');
     btnLeft.className = "cheat_btn";
-    btnLeft.innerHTML = "←";
+    btnLeft.innerHTML = "◄";
     Cheat_Menu.addEvent(btnLeft, scroll_handler.bind(null, "left"));
 
     var centerText = document.createElement('div');
     centerText.className = "cheat_value";
-    centerText.innerHTML = text;
-    centerText.style.flex = "1";
-    centerText.style.margin = "0 10px";
+    centerText.innerHTML = text.replace(/^.*?: /, '');
+    centerText.style.minWidth = "28px";
 
     var btnRight = document.createElement('button');
     btnRight.className = "cheat_btn";
-    btnRight.innerHTML = "→";
+    btnRight.innerHTML = "►";
     Cheat_Menu.addEvent(btnRight, scroll_handler.bind(null, "right"));
 
-    row.appendChild(btnLeft);
-    row.appendChild(centerText);
-    row.appendChild(btnRight);
+    btnRow.appendChild(btnLeft);
+    btnRow.appendChild(centerText);
+    btnRow.appendChild(btnRight);
 
     if (apply_handler) {
         var btnApply = document.createElement('button');
         btnApply.className = "cheat_btn";
         btnApply.innerHTML = "Apply";
-        btnApply.style.marginLeft = "10px";
         Cheat_Menu.addEvent(btnApply, apply_handler);
-        row.appendChild(btnApply);
+        btnRow.appendChild(btnApply);
     }
+
+    actions.appendChild(btnRow);
+    row.appendChild(label);
+    row.appendChild(actions);
 
     Cheat_Menu.content.appendChild(row);
 };
 
+Cheat_Menu.append_sub_header = function (text) {
+    var el = document.createElement('div');
+    el.className = "cheat_sub_header";
+    el.innerHTML = text;
+    Cheat_Menu.content.appendChild(el);
+};
+
+// Simple add/remove row: label left, [-amount] [+amount] right
 Cheat_Menu.append_add_remove = function (text, amount, onApply) {
     var row = document.createElement('div');
-    row.className = "cheat_row";
+    row.className = "cheat_control_grid";
 
     var label = document.createElement('div');
-    label.className = "cheat_label";
+    label.className = "cheat_control_label";
     label.innerHTML = text;
 
-    var controls = document.createElement('div');
-    controls.className = "cheat_controls";
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btnRemove = document.createElement('button');
     btnRemove.className = "cheat_btn";
-    btnRemove.innerHTML = "- " + amount;
+    btnRemove.innerHTML = "-" + amount;
     Cheat_Menu.addEvent(btnRemove, function () { onApply("left"); });
 
     var btnAdd = document.createElement('button');
     btnAdd.className = "cheat_btn";
-    btnAdd.innerHTML = "+ " + amount;
+    btnAdd.innerHTML = "+" + amount;
     Cheat_Menu.addEvent(btnAdd, function () { onApply("right"); });
 
-    controls.appendChild(btnRemove);
-    controls.appendChild(btnAdd);
+    btnRow.appendChild(btnRemove);
+    btnRow.appendChild(btnAdd);
+    actions.appendChild(btnRow);
 
     row.appendChild(label);
-    row.appendChild(controls);
+    row.appendChild(actions);
 
     Cheat_Menu.content.appendChild(row);
 };
@@ -1801,117 +1897,88 @@ Cheat_Menu.append_add_remove = function (text, amount, onApply) {
 // Cheat Menu - Settings & Bottom Bar Builders
 // ============================================================
 
+// Compact amount display helper
+Cheat_Menu.format_amount = function (n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + "M";
+    if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + "K";
+    return "" + n;
+};
+
 Cheat_Menu.append_bottom_bar_controls = function (labelText, onZero, onApply) {
     var row = document.createElement('div');
-    row.className = "cheat_bottom_bar";
+    row.className = "cheat_modifier_row";
 
-    var label = document.createElement('div');
-    label.className = "cheat_label";
-    label.style.flex = "0 0 auto";
-    label.style.fontSize = "0.85em";
-    label.innerHTML = labelText;
+    // Left group: [Value: n] [+n] [-n] [RESET]
+    var leftGroup = document.createElement('div');
+    leftGroup.className = "modifier_group_left";
 
-    var amtSelector = document.createElement('div');
-    amtSelector.className = "cheat_controls";
+    var valLabel = document.createElement('span');
+    valLabel.className = "cheat_modifier_value";
+    valLabel.innerHTML = labelText;
 
-    var btnL = document.createElement('button');
-    btnL.className = "cheat_btn";
-    btnL.innerHTML = "◄";
-    Cheat_Menu.addEvent(btnL, function (e) {
-        e.preventDefault();
-        Cheat_Menu.scroll_amount("left");
-    });
-
-    var val = document.createElement('div');
-    val.className = "cheat_value";
-    val.style.minWidth = "30px";
-    val.innerHTML = Cheat_Menu.amounts[Cheat_Menu.amount_index];
-
-    var btnR = document.createElement('button');
-    btnR.className = "cheat_btn";
-    btnR.innerHTML = "►";
-    Cheat_Menu.addEvent(btnR, function (e) {
-        e.preventDefault();
-        Cheat_Menu.scroll_amount("right");
-    });
-
-    var btnCustom = document.createElement('button');
-    btnCustom.className = "cheat_btn";
-    btnCustom.innerHTML = "…";
-    btnCustom.title = "Custom amount";
-    Cheat_Menu.addEvent(btnCustom, function (e) {
-        e.preventDefault();
-        var customVal = Cheat_Menu.amounts[Cheat_Menu.amount_index];
-        Cheat_Menu.open_value_modal("Custom Amount", customVal, function (newVal) {
-            if (!isNaN(newVal) && newVal >= 0) {
-                for (var i = 0; i < Cheat_Menu.amounts.length; i++) {
-                    if (Cheat_Menu.amounts[i] >= newVal) {
-                        Cheat_Menu.amount_index = i;
-                        break;
-                    }
-                    Cheat_Menu.amount_index = Cheat_Menu.amounts.length - 1;
-                }
-                Cheat_Menu.update_menu();
-            }
-        });
-    });
-
-    amtSelector.appendChild(btnL);
-    amtSelector.appendChild(val);
-    amtSelector.appendChild(btnR);
-    amtSelector.appendChild(btnCustom);
-
-    var actions = document.createElement('div');
-    actions.className = "cheat_controls";
-
-    var btnZero = document.createElement('button');
-    btnZero.className = "cheat_btn";
-    btnZero.innerHTML = "0";
-    btnZero.style.minWidth = "30px";
-    Cheat_Menu.addEvent(btnZero, function (e) {
-        e.preventDefault();
-        onZero();
-    });
-
-    var btnMinus = document.createElement('button');
-    btnMinus.className = "cheat_btn";
-    btnMinus.innerHTML = "-" + Cheat_Menu.amounts[Cheat_Menu.amount_index];
-    btnMinus.style.minWidth = "40px";
-    Cheat_Menu.addEvent(btnMinus, function (e) {
-        e.preventDefault();
-        onApply("left");
-    });
+    var amt = Cheat_Menu.amounts[Cheat_Menu.amount_index];
+    var amtStr = Cheat_Menu.format_amount(amt);
 
     var btnPlus = document.createElement('button');
     btnPlus.className = "cheat_btn";
-    btnPlus.innerHTML = "+" + Cheat_Menu.amounts[Cheat_Menu.amount_index];
-    btnPlus.style.minWidth = "40px";
-    Cheat_Menu.addEvent(btnPlus, function (e) {
-        e.preventDefault();
-        onApply("right");
-    });
+    btnPlus.innerHTML = "+" + amtStr;
+    Cheat_Menu.addEvent(btnPlus, function (e) { e.preventDefault(); onApply("right"); });
 
-    actions.appendChild(btnZero);
-    actions.appendChild(btnMinus);
-    actions.appendChild(btnPlus);
+    var btnMinus = document.createElement('button');
+    btnMinus.className = "cheat_btn";
+    btnMinus.innerHTML = "-" + amtStr;
+    Cheat_Menu.addEvent(btnMinus, function (e) { e.preventDefault(); onApply("left"); });
 
-    row.appendChild(label);
-    amtSelector.style.marginRight = "10px";
-    row.appendChild(amtSelector);
-    row.appendChild(actions);
+    var btnReset = document.createElement('button');
+    btnReset.className = "cheat_btn";
+    btnReset.innerHTML = "RESET";
+    Cheat_Menu.addEvent(btnReset, function (e) { e.preventDefault(); onZero(); });
+
+    leftGroup.appendChild(valLabel);
+    leftGroup.appendChild(btnPlus);
+    leftGroup.appendChild(btnMinus);
+    leftGroup.appendChild(btnReset);
+
+    // Right group: [Step: n] [▲] [▼]
+    var rightGroup = document.createElement('div');
+    rightGroup.className = "modifier_group_right";
+
+    var stepLabel = document.createElement('span');
+    stepLabel.className = "cheat_modifier_step_label";
+    stepLabel.innerHTML = "Step: " + Cheat_Menu.format_amount(amt);
+
+    var btnStepUp = document.createElement('button');
+    btnStepUp.className = "cheat_btn";
+    btnStepUp.innerHTML = "▲";
+    Cheat_Menu.addEvent(btnStepUp, function (e) { e.preventDefault(); Cheat_Menu.scroll_amount("right"); });
+
+    var btnStepDown = document.createElement('button');
+    btnStepDown.className = "cheat_btn";
+    btnStepDown.innerHTML = "▼";
+    Cheat_Menu.addEvent(btnStepDown, function (e) { e.preventDefault(); Cheat_Menu.scroll_amount("left"); });
+
+    rightGroup.appendChild(stepLabel);
+    rightGroup.appendChild(btnStepUp);
+    rightGroup.appendChild(btnStepDown);
+
+    row.appendChild(leftGroup);
+    row.appendChild(rightGroup);
     Cheat_Menu.content.appendChild(row);
 };
 
 Cheat_Menu.append_setting_row = function (label, valueText, onLeft, onRight) {
     var row = document.createElement('div');
-    row.className = "cheat_setting_row";
+    row.className = "cheat_control_grid";
 
     var labelDiv = document.createElement('div');
-    labelDiv.className = "cheat_label";
+    labelDiv.className = "cheat_control_label";
     labelDiv.innerHTML = label;
 
-    var controls = document.createElement('div');
-    controls.className = "cheat_controls";
+    var actions = document.createElement('div');
+    actions.className = "cheat_control_actions";
+
+    var btnRow = document.createElement('div');
+    btnRow.className = "cheat_btn_row";
 
     var btnLeft = document.createElement('button');
     btnLeft.className = "cheat_btn";
@@ -1928,6 +1995,7 @@ Cheat_Menu.append_setting_row = function (label, valueText, onLeft, onRight) {
     var valDiv = document.createElement('div');
     valDiv.className = "cheat_value";
     valDiv.innerHTML = valueText;
+    valDiv.style.minWidth = "30px";
 
     var btnRight = document.createElement('button');
     btnRight.className = "cheat_btn";
@@ -1941,12 +2009,14 @@ Cheat_Menu.append_setting_row = function (label, valueText, onLeft, onRight) {
         btnRight.style.visibility = "hidden";
     }
 
-    controls.appendChild(btnLeft);
-    controls.appendChild(valDiv);
-    controls.appendChild(btnRight);
+    btnRow.appendChild(btnLeft);
+    btnRow.appendChild(valDiv);
+    btnRow.appendChild(btnRight);
+    actions.appendChild(btnRow);
 
     row.appendChild(labelDiv);
-    row.appendChild(controls);
+    row.appendChild(actions);
+
     Cheat_Menu.content.appendChild(row);
 };
 
@@ -2015,8 +2085,7 @@ Cheat_Menu.append_actor_selection = function () {
 Cheat_Menu.create_page_combat_vitals = function () {
     Cheat_Menu.append_cheat_title("Combat");
 
-    Cheat_Menu.append_title("Party");
-    var items = [
+    var partyItems = [
         { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(0, true); } },
         { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(1, true); } },
         { label: "Full HP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_hp(true); } },
@@ -2037,39 +2106,6 @@ Cheat_Menu.create_page_combat_vitals = function () {
         { label: "Full TP", btn: "All", fn: function () { Cheat_Menu.recover_party_tp(false); } }
     ];
 
-    var grid = document.createElement('div');
-    grid.className = "cheat_action_grid";
-
-    for (var i = 0; i < items.length; i++) {
-        (function (item) {
-            var cell = document.createElement('div');
-            cell.className = "cheat_action_cell";
-
-            var btn = document.createElement('button');
-            btn.className = "cheat_btn";
-            var tagClass = item.btn === 'All' ? 'tag-all' : 'tag-alive';
-            btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
-            btn.style.width = "100%";
-            btn.style.height = "100%";
-            btn.style.padding = "4px 3px";
-            btn.style.lineHeight = "1.3";
-            btn.style.whiteSpace = "normal";
-            btn.style.wordBreak = "break-word";
-            Cheat_Menu.addEvent(btn, function (e) {
-                e.preventDefault();
-                item.fn();
-                SoundManager.playSystemSound(1);
-                Cheat_Menu.update_menu();
-            });
-
-            cell.appendChild(btn);
-            grid.appendChild(cell);
-        })(items[i]);
-    }
-
-    Cheat_Menu.content.appendChild(grid);
-
-    Cheat_Menu.append_title("Enemy");
     var enemyItems = [
         { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(0, true); } },
         { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(1, true); } },
@@ -2077,37 +2113,63 @@ Cheat_Menu.create_page_combat_vitals = function () {
         { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_enemy_hp(1, false); } }
     ];
 
-    var enemyGrid = document.createElement('div');
-    enemyGrid.className = "cheat_action_grid";
+    function buildCombatSection(sectionTitle, items) {
+        var section = document.createElement('div');
+        section.className = "cheat_combat_section";
 
-    for (var j = 0; j < enemyItems.length; j++) {
-        (function (item) {
-            var cell = document.createElement('div');
-            cell.className = "cheat_action_cell";
+        var titleDiv = document.createElement('div');
+        titleDiv.className = "cheat_menu_title";
+        titleDiv.innerHTML = sectionTitle;
+        section.appendChild(titleDiv);
 
-            var btn = document.createElement('button');
-            btn.className = "cheat_btn";
-            var tagClass = item.btn === 'All' ? 'tag-all' : 'tag-alive';
-            btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
-            btn.style.width = "100%";
-            btn.style.height = "100%";
-            btn.style.padding = "4px 3px";
-            btn.style.lineHeight = "1.3";
-            btn.style.whiteSpace = "normal";
-            btn.style.wordBreak = "break-word";
-            Cheat_Menu.addEvent(btn, function (e) {
-                e.preventDefault();
-                item.fn();
-                SoundManager.playSystemSound(1);
-                Cheat_Menu.update_menu();
-            });
+        var aliveItems = [];
+        var allItems = [];
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].btn === 'Alive') {
+                aliveItems.push(items[i]);
+            } else {
+                allItems.push(items[i]);
+            }
+        }
 
-            cell.appendChild(btn);
-            enemyGrid.appendChild(cell);
-        })(enemyItems[j]);
+        var row = document.createElement('div');
+        row.className = "cheat_combat_row";
+
+        function makeColumn(btnLabel, columnItems) {
+            var col = document.createElement('div');
+            col.className = "cheat_combat_column";
+
+            var header = document.createElement('div');
+            header.className = "cheat_combat_header";
+            header.innerHTML = btnLabel;
+            col.appendChild(header);
+
+            for (var j = 0; j < columnItems.length; j++) {
+                (function (item) {
+                    var btn = document.createElement('button');
+                    btn.className = "cheat_btn";
+                    btn.innerHTML = "<b>" + item.label + "</b>";
+                    Cheat_Menu.addEvent(btn, function (e) {
+                        e.preventDefault();
+                        item.fn();
+                        SoundManager.playSystemSound(1);
+                        Cheat_Menu.update_menu();
+                    });
+                    col.appendChild(btn);
+                })(columnItems[j]);
+            }
+
+            return col;
+        }
+
+        row.appendChild(makeColumn("Alive", aliveItems));
+        row.appendChild(makeColumn("All", allItems));
+        section.appendChild(row);
+        Cheat_Menu.content.appendChild(section);
     }
 
-    Cheat_Menu.content.appendChild(enemyGrid);
+    buildCombatSection("Party", partyItems);
+    buildCombatSection("Enemy", enemyItems);
 };
 
 
@@ -2164,14 +2226,7 @@ Cheat_Menu.create_page_progression = function () {
     Cheat_Menu.append_actor_selection();
 
     // Stats
-    var statSection = document.createElement('div');
-    statSection.className = "cheat_progression_section";
-
-    var statRow = document.createElement('div');
-    statRow.className = "cheat_sub_header";
-    statRow.innerHTML = "Stats";
-    statSection.appendChild(statRow);
-
+    Cheat_Menu.append_sub_header("Stats");
     var stat_string = "";
     if ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) {
         if (Cheat_Menu.stat_selection >= $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus.length) {
@@ -2179,33 +2234,10 @@ Cheat_Menu.create_page_progression = function () {
         }
         stat_string += $dataSystem.terms.params[Cheat_Menu.stat_selection];
     }
-    var row = document.createElement('div');
-    row.className = "cheat_row";
-    var btnL = document.createElement('button');
-    btnL.className = "cheat_btn";
-    btnL.innerHTML = "◄";
-    Cheat_Menu.addEvent(btnL, function (e) {
-        e.preventDefault();
-        Cheat_Menu.scroll_stat("left");
+    Cheat_Menu.append_scroll_selector(stat_string, null, null, function (dir) {
+        Cheat_Menu.scroll_stat(dir);
     });
-    var statLbl = document.createElement('div');
-    statLbl.className = "cheat_value";
-    statLbl.innerHTML = stat_string;
-    statLbl.style.flex = "1";
-    var btnR = document.createElement('button');
-    btnR.className = "cheat_btn";
-    btnR.innerHTML = "►";
-    Cheat_Menu.addEvent(btnR, function (e) {
-        e.preventDefault();
-        Cheat_Menu.scroll_stat("right");
-    });
-    row.appendChild(btnL);
-    row.appendChild(statLbl);
-    row.appendChild(btnR);
-    statSection.appendChild(row);
 
-    var prevContent = Cheat_Menu.content;
-    Cheat_Menu.content = statSection;
     var statQty = ($gameActors._data[Cheat_Menu.cheat_selected_actor] && $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus) ?
         $gameActors._data[Cheat_Menu.cheat_selected_actor]._paramPlus[Cheat_Menu.stat_selection] : 0;
     Cheat_Menu.append_bottom_bar_controls("Bonus: " + statQty,
@@ -2216,20 +2248,9 @@ Cheat_Menu.create_page_progression = function () {
         },
         Cheat_Menu.apply_current_stat
     );
-    Cheat_Menu.content = prevContent;
-    Cheat_Menu.content.appendChild(statSection);
 
     // EXP
-    var expSection = document.createElement('div');
-    expSection.className = "cheat_progression_section";
-
-    var expHeader = document.createElement('div');
-    expHeader.className = "cheat_sub_header";
-    expHeader.innerHTML = "EXP";
-    expSection.appendChild(expHeader);
-
-    var prevContent2 = Cheat_Menu.content;
-    Cheat_Menu.content = expSection;
+    Cheat_Menu.append_sub_header("EXP");
     var expQty = $gameActors._data[Cheat_Menu.cheat_selected_actor] ? $gameActors._data[Cheat_Menu.cheat_selected_actor].currentExp() : 0;
     Cheat_Menu.append_bottom_bar_controls("EXP: " + expQty,
         function () {
@@ -2241,20 +2262,9 @@ Cheat_Menu.create_page_progression = function () {
         },
         Cheat_Menu.apply_current_exp
     );
-    Cheat_Menu.content = prevContent2;
-    Cheat_Menu.content.appendChild(expSection);
 
     // Gold
-    var goldSection = document.createElement('div');
-    goldSection.className = "cheat_progression_section";
-
-    var goldHeader = document.createElement('div');
-    goldHeader.className = "cheat_sub_header";
-    goldHeader.innerHTML = "Gold";
-    goldSection.appendChild(goldHeader);
-
-    var prevContent3 = Cheat_Menu.content;
-    Cheat_Menu.content = goldSection;
+    Cheat_Menu.append_sub_header("Gold");
     var goldQty = $gameParty._gold;
     Cheat_Menu.append_bottom_bar_controls("Gold: " + goldQty,
         function () {
@@ -2264,8 +2274,6 @@ Cheat_Menu.create_page_progression = function () {
         },
         Cheat_Menu.apply_current_gold
     );
-    Cheat_Menu.content = prevContent3;
-    Cheat_Menu.content.appendChild(goldSection);
 };
 
 Cheat_Menu.scroll_stat = function (direction) {
@@ -2334,23 +2342,29 @@ Cheat_Menu.create_page_speed = function () {
     Cheat_Menu.append_cheat_title("Movement");
     Cheat_Menu.initialize_speed_lock();
 
-    Cheat_Menu.append_title("Speed");
+    Cheat_Menu.append_sub_header("Speed");
+
+    // Presets as compact grid row
     var presets = [
         { label: "Slow", speed: 2 },
         { label: "Normal", speed: 4 },
         { label: "Fast", speed: 5 },
         { label: "Max", speed: 6 }
     ];
-    var row = document.createElement('div');
-    row.className = "cheat_row";
-    row.style.flexWrap = "wrap";
-    row.style.justifyContent = "center";
+    var pRow = document.createElement('div');
+    pRow.className = "cheat_control_grid";
+    var pLabel = document.createElement('div');
+    pLabel.className = "cheat_control_label";
+    pLabel.innerHTML = "Presets";
+    var pActions = document.createElement('div');
+    pActions.className = "cheat_control_actions";
+    var pBtnRow = document.createElement('div');
+    pBtnRow.className = "cheat_btn_row";
     for (var i = 0; i < presets.length; i++) {
         (function (p) {
             var btn = document.createElement('button');
             btn.className = "cheat_btn";
-            btn.style.minWidth = "60px";
-            btn.style.flex = "1";
+            btn.style.minWidth = "44px";
             btn.innerHTML = p.label;
             Cheat_Menu.addEvent(btn, function (e) {
                 e.preventDefault();
@@ -2358,12 +2372,15 @@ Cheat_Menu.create_page_speed = function () {
                 SoundManager.playSystemSound(1);
                 Cheat_Menu.update_menu();
             });
-            row.appendChild(btn);
+            pBtnRow.appendChild(btn);
         })(presets[i]);
     }
-    Cheat_Menu.content.appendChild(row);
+    pActions.appendChild(pBtnRow);
+    pRow.appendChild(pLabel);
+    pRow.appendChild(pActions);
+    Cheat_Menu.content.appendChild(pRow);
 
-    var currentSpeed = "<font color='#44cc55'>" + Cheat_Menu.speed + "</font>";
+    var currentSpeed = "Speed: <font color='#44cc55'>" + Cheat_Menu.speed + "</font>";
     Cheat_Menu.append_scroll_selector(currentSpeed, null, null, function (dir) {
         Cheat_Menu.change_player_speed(dir === "left" ? -1 : 1);
         SoundManager.playSystemSound(dir === "left" ? 2 : 1);
@@ -2378,7 +2395,7 @@ Cheat_Menu.create_page_speed = function () {
     }
     Cheat_Menu.append_cheat("Speed Lock", lockText, null, Cheat_Menu.apply_speed_lock_toggle);
 
-    Cheat_Menu.append_title("No Clip");
+    Cheat_Menu.append_sub_header("No Clip");
     var ncText;
     if ($gamePlayer._through) {
         ncText = "<font color='#00ff00'>on</font>";
@@ -2681,30 +2698,28 @@ Cheat_Menu.create_page_save_recall = function () {
         }
 
         var row = document.createElement('div');
-        row.className = "cheat_row";
+        row.className = "cheat_control_grid";
 
         var label = document.createElement('div');
-        label.className = "cheat_label";
-        label.style.flex = "1";
-        label.style.fontSize = "0.85em";
-        label.style.overflow = "hidden";
-        label.style.textOverflow = "ellipsis";
-        label.style.whiteSpace = "nowrap";
+        label.className = "cheat_control_label";
         label.innerHTML = slotLabel;
 
-        var controls = document.createElement('div');
-        controls.className = "cheat_controls";
+        var actions = document.createElement('div');
+        actions.className = "cheat_control_actions";
+
+        var btnRow = document.createElement('div');
+        btnRow.className = "cheat_btn_row";
 
         var btnSave = document.createElement('button');
         btnSave.className = "cheat_btn";
         btnSave.innerHTML = "Save";
-        btnSave.style.minWidth = "50px";
+        btnSave.style.minWidth = "44px";
         Cheat_Menu.addEvent(btnSave, Cheat_Menu.save_position.bind(null, i));
 
         var btnRecall = document.createElement('button');
         btnRecall.className = "cheat_btn";
         btnRecall.innerHTML = "Recall";
-        btnRecall.style.minWidth = "55px";
+        btnRecall.style.minWidth = "50px";
         if (pos.m !== -1) {
             btnRecall.style.borderColor = "#44cc55";
         } else {
@@ -2730,10 +2745,11 @@ Cheat_Menu.create_page_save_recall = function () {
             };
         })(i));
 
-        controls.appendChild(btnSave);
-        controls.appendChild(btnRecall);
+        btnRow.appendChild(btnSave);
+        btnRow.appendChild(btnRecall);
+        actions.appendChild(btnRow);
         row.appendChild(label);
-        row.appendChild(controls);
+        row.appendChild(actions);
         Cheat_Menu.content.appendChild(row);
     }
 };
@@ -2771,8 +2787,8 @@ Cheat_Menu.create_page_teleport = function () {
             if (idx === Cheat_Menu.teleport_location.m) {
                 return "<font color='#44cc55'>selected</font>";
             }
-            return "";
-        }
+        },
+        null, null, "teleport"
     );
 
     Cheat_Menu.append_cheat("Current Position", "Fill", null, function () {
@@ -2783,25 +2799,93 @@ Cheat_Menu.create_page_teleport = function () {
         Cheat_Menu.update_menu();
     });
 
-    Cheat_Menu.append_scroll_selector("X: " + Cheat_Menu.teleport_location.x, null, null, Cheat_Menu.scroll_x_teleport_selection);
-    Cheat_Menu.append_scroll_selector("Y: " + Cheat_Menu.teleport_location.y, null, null, Cheat_Menu.scroll_y_teleport_selection);
-    function tpAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); }
-    function tpClipAction(e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); $gamePlayer._through = true; SoundManager.playSystemSound(1); }
+    // Combined X/Y coordinates row
+    var coordRow = document.createElement('div');
+    coordRow.className = "cheat_control_grid";
+    var coordLabel = document.createElement('div');
+    coordLabel.className = "cheat_control_label";
+    coordLabel.innerHTML = "Coordinates";
+    var coordActions = document.createElement('div');
+    coordActions.className = "cheat_control_actions";
+    var coordBtnRow = document.createElement('div');
+    coordBtnRow.className = "cheat_btn_row";
+    coordBtnRow.style.gap = "12px";
+    // X cluster
+    var xCluster = document.createElement('span');
+    xCluster.className = "cheat_coord_cluster";
+    var xLabelEl = document.createElement('span');
+    xLabelEl.className = "cheat_val_xy";
+    xLabelEl.innerHTML = "X:";
+    var xBtnLeft = document.createElement('button');
+    xBtnLeft.className = "cheat_btn";
+    xBtnLeft.innerHTML = "◄";
+    Cheat_Menu.addEvent(xBtnLeft, Cheat_Menu.scroll_x_teleport_selection.bind(null, "left"));
+    var xVal = document.createElement('span');
+    xVal.className = "cheat_value";
+    xVal.innerHTML = Cheat_Menu.teleport_location.x;
+    xVal.style.minWidth = "20px";
+    var xBtnRight = document.createElement('button');
+    xBtnRight.className = "cheat_btn";
+    xBtnRight.innerHTML = "►";
+    Cheat_Menu.addEvent(xBtnRight, Cheat_Menu.scroll_x_teleport_selection.bind(null, "right"));
+    xCluster.appendChild(xLabelEl);
+    xCluster.appendChild(xBtnLeft);
+    xCluster.appendChild(xVal);
+    xCluster.appendChild(xBtnRight);
+    // Y cluster
+    var yCluster = document.createElement('span');
+    yCluster.className = "cheat_coord_cluster";
+    var yLabelEl = document.createElement('span');
+    yLabelEl.className = "cheat_val_xy";
+    yLabelEl.innerHTML = "Y:";
+    var yBtnLeft = document.createElement('button');
+    yBtnLeft.className = "cheat_btn";
+    yBtnLeft.innerHTML = "◄";
+    Cheat_Menu.addEvent(yBtnLeft, Cheat_Menu.scroll_y_teleport_selection.bind(null, "left"));
+    var yVal = document.createElement('span');
+    yVal.className = "cheat_value";
+    yVal.innerHTML = Cheat_Menu.teleport_location.y;
+    yVal.style.minWidth = "20px";
+    var yBtnRight = document.createElement('button');
+    yBtnRight.className = "cheat_btn";
+    yBtnRight.innerHTML = "►";
+    Cheat_Menu.addEvent(yBtnRight, Cheat_Menu.scroll_y_teleport_selection.bind(null, "right"));
+    yCluster.appendChild(yLabelEl);
+    yCluster.appendChild(yBtnLeft);
+    yCluster.appendChild(yVal);
+    yCluster.appendChild(yBtnRight);
+    coordBtnRow.appendChild(xCluster);
+    coordBtnRow.appendChild(yCluster);
+    coordActions.appendChild(coordBtnRow);
+    coordRow.appendChild(coordLabel);
+    coordRow.appendChild(coordActions);
+    Cheat_Menu.content.appendChild(coordRow);
+
+    // Action row
     var tRow = document.createElement('div');
-    tRow.className = "cheat_row";
-    tRow.style.gap = "6px";
+    tRow.className = "cheat_control_grid";
+    var tLabel = document.createElement('div');
+    tLabel.className = "cheat_control_label";
+    tLabel.innerHTML = "Action";
+    var tActions = document.createElement('div');
+    tActions.className = "cheat_control_actions";
+    var tBtnRow = document.createElement('div');
+    tBtnRow.className = "cheat_btn_row";
     var tBtn = document.createElement('button');
     tBtn.className = "cheat_btn";
-    tBtn.style.flex = "1";
+    tBtn.style.minWidth = "56px";
     tBtn.innerHTML = "Activate";
-    Cheat_Menu.addEvent(tBtn, tpAction);
-    tRow.appendChild(tBtn);
+    Cheat_Menu.addEvent(tBtn, function (e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); });
+    tBtnRow.appendChild(tBtn);
     var tnBtn = document.createElement('button');
     tnBtn.className = "cheat_btn";
-    tnBtn.style.flex = "1";
-    tnBtn.innerHTML = "TP+Clip";
-    Cheat_Menu.addEvent(tnBtn, tpClipAction);
-    tRow.appendChild(tnBtn);
+    tnBtn.style.minWidth = "56px";
+    tnBtn.innerHTML = "TP + NoClip";
+    Cheat_Menu.addEvent(tnBtn, function (e) { e.preventDefault(); Cheat_Menu.teleport_current_location(); $gamePlayer._through = true; SoundManager.playSystemSound(1); });
+    tBtnRow.appendChild(tnBtn);
+    tActions.appendChild(tBtnRow);
+    tRow.appendChild(tLabel);
+    tRow.appendChild(tActions);
     Cheat_Menu.content.appendChild(tRow);
 };
 

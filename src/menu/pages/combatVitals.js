@@ -5,8 +5,7 @@
 Cheat_Menu.create_page_combat_vitals = function () {
     Cheat_Menu.append_cheat_title("Combat");
 
-    Cheat_Menu.append_title("Party");
-    var items = [
+    var partyItems = [
         { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(0, true); } },
         { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_party_hp(1, true); } },
         { label: "Full HP", btn: "Alive", fn: function () { Cheat_Menu.recover_party_hp(true); } },
@@ -27,39 +26,6 @@ Cheat_Menu.create_page_combat_vitals = function () {
         { label: "Full TP", btn: "All", fn: function () { Cheat_Menu.recover_party_tp(false); } }
     ];
 
-    var grid = document.createElement('div');
-    grid.className = "cheat_action_grid";
-
-    for (var i = 0; i < items.length; i++) {
-        (function (item) {
-            var cell = document.createElement('div');
-            cell.className = "cheat_action_cell";
-
-            var btn = document.createElement('button');
-            btn.className = "cheat_btn";
-            var tagClass = item.btn === 'All' ? 'tag-all' : 'tag-alive';
-            btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
-            btn.style.width = "100%";
-            btn.style.height = "100%";
-            btn.style.padding = "4px 3px";
-            btn.style.lineHeight = "1.3";
-            btn.style.whiteSpace = "normal";
-            btn.style.wordBreak = "break-word";
-            Cheat_Menu.addEvent(btn, function (e) {
-                e.preventDefault();
-                item.fn();
-                SoundManager.playSystemSound(1);
-                Cheat_Menu.update_menu();
-            });
-
-            cell.appendChild(btn);
-            grid.appendChild(cell);
-        })(items[i]);
-    }
-
-    Cheat_Menu.content.appendChild(grid);
-
-    Cheat_Menu.append_title("Enemy");
     var enemyItems = [
         { label: "HP 0", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(0, true); } },
         { label: "HP 1", btn: "Alive", fn: function () { Cheat_Menu.set_enemy_hp(1, true); } },
@@ -67,35 +33,61 @@ Cheat_Menu.create_page_combat_vitals = function () {
         { label: "HP 1", btn: "All", fn: function () { Cheat_Menu.set_enemy_hp(1, false); } }
     ];
 
-    var enemyGrid = document.createElement('div');
-    enemyGrid.className = "cheat_action_grid";
+    function buildCombatSection(sectionTitle, items) {
+        var section = document.createElement('div');
+        section.className = "cheat_combat_section";
 
-    for (var j = 0; j < enemyItems.length; j++) {
-        (function (item) {
-            var cell = document.createElement('div');
-            cell.className = "cheat_action_cell";
+        var titleDiv = document.createElement('div');
+        titleDiv.className = "cheat_menu_title";
+        titleDiv.innerHTML = sectionTitle;
+        section.appendChild(titleDiv);
 
-            var btn = document.createElement('button');
-            btn.className = "cheat_btn";
-            var tagClass = item.btn === 'All' ? 'tag-all' : 'tag-alive';
-            btn.innerHTML = "<b>" + item.label + "</b><br><small class='" + tagClass + "'>" + item.btn + "</small>";
-            btn.style.width = "100%";
-            btn.style.height = "100%";
-            btn.style.padding = "4px 3px";
-            btn.style.lineHeight = "1.3";
-            btn.style.whiteSpace = "normal";
-            btn.style.wordBreak = "break-word";
-            Cheat_Menu.addEvent(btn, function (e) {
-                e.preventDefault();
-                item.fn();
-                SoundManager.playSystemSound(1);
-                Cheat_Menu.update_menu();
-            });
+        var aliveItems = [];
+        var allItems = [];
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].btn === 'Alive') {
+                aliveItems.push(items[i]);
+            } else {
+                allItems.push(items[i]);
+            }
+        }
 
-            cell.appendChild(btn);
-            enemyGrid.appendChild(cell);
-        })(enemyItems[j]);
+        var row = document.createElement('div');
+        row.className = "cheat_combat_row";
+
+        function makeColumn(btnLabel, columnItems) {
+            var col = document.createElement('div');
+            col.className = "cheat_combat_column";
+
+            var header = document.createElement('div');
+            header.className = "cheat_combat_header";
+            header.innerHTML = btnLabel;
+            col.appendChild(header);
+
+            for (var j = 0; j < columnItems.length; j++) {
+                (function (item) {
+                    var btn = document.createElement('button');
+                    btn.className = "cheat_btn";
+                    btn.innerHTML = "<b>" + item.label + "</b>";
+                    Cheat_Menu.addEvent(btn, function (e) {
+                        e.preventDefault();
+                        item.fn();
+                        SoundManager.playSystemSound(1);
+                        Cheat_Menu.update_menu();
+                    });
+                    col.appendChild(btn);
+                })(columnItems[j]);
+            }
+
+            return col;
+        }
+
+        row.appendChild(makeColumn("Alive", aliveItems));
+        row.appendChild(makeColumn("All", allItems));
+        section.appendChild(row);
+        Cheat_Menu.content.appendChild(section);
     }
 
-    Cheat_Menu.content.appendChild(enemyGrid);
+    buildCombatSection("Party", partyItems);
+    buildCombatSection("Enemy", enemyItems);
 };
