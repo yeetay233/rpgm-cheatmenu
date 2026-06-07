@@ -2,7 +2,7 @@
 
 # Cheat Menu — RPG Maker MV/MZ
 
-![Version](https://img.shields.io/badge/version-1.0.0-44cc55?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.1.0-44cc55?style=flat-square)
 ![RPG Maker MV](https://img.shields.io/badge/RPG_Maker-MV-44cc55?style=flat-square)
 ![RPG Maker MZ](https://img.shields.io/badge/RPG_Maker-MZ-44cc55?style=flat-square)
 
@@ -24,11 +24,11 @@
 - **Movement** — speed multiplier and no-clip (walk through walls)
 - **Teleport** — teleport to any map by searching a filterable list
 - **Switches & Variables** — browse, search, and modify game switches/variables
-- **Save & Recall** — save/load named snapshot states
+- **Savestates** — 10 slots + Quick Save with persistence across restarts
 - **Clear States** — remove all status ailments from selected actors
 - **Configurable layout** — menu position, font size, scale, and sidebar grouping
 - **Scroll buttons** — sticky scroll arrows for sidebar, lists, and content areas
-- **Responsive** — works on desktop and mobile (JoiPlay)
+- **Responsive** — works on desktop and mobile (JoiPlay, if added there)
 - **Persistent settings** — cheat state saves with your game
 
 ---
@@ -95,7 +95,6 @@ Cheat_Menu/
 │   ├── input/
 │   ├── menu/
 │   │   └── pages/
-│   ├── storage/
 │   └── ui/
 │       ├── builders/
 │       ├── components/
@@ -111,7 +110,7 @@ Cheat_Menu/
 
 - [emerladcoder / RPG Maker MV Cheat Menu Plugin](https://github.com/emerladcoder/rpg-maker-mv-cheat-menu-plugin) — original cheat menu for RPG Maker MV
 - [NamelessMagician / RPG Maker MV-MZ Cheat Menu Plugin](https://github.com/NamelessMagician/RPG-Maker-MV-MZ-Cheat-Menu-Plugin) — continued development and MZ compatibility
-- **yeetay233** — QoL improvements and UI overhauls
+- **yeetay233** — QoL improvements, UI overhauls, and continued development
 
 ---
 
